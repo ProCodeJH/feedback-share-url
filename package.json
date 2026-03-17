@@ -1,0 +1,8 @@
+{
+  "name": "feedback-share-url",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "publisher": "node tools/publisher-server.mjs"
+  }
+}

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>피드백 발행기</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f4efe5;
+      --ink: #173127;
+      --ink-soft: #597063;
+      --forest: #224a3a;
+      --forest-deep: #142b21;
+      --gold: #b98745;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body {
+      font-family: "Noto Sans KR", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(185,135,69,0.22), transparent 28%),
+        radial-gradient(circle at top right, rgba(34,74,58,0.18), transparent 32%),
+        linear-gradient(180deg, #e8dfd0 0%, var(--paper) 44%, #ece4d8 100%);
+    }
+    .shell {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 28px 18px 42px;
+    }
+    .hero {
+      margin-bottom: 18px;
+      padding: 28px;
+      border-radius: 28px;
+      background: linear-gradient(145deg, rgba(20,43,33,0.98), rgba(34,74,58,0.94));
+      color: white;
+      box-shadow: 0 24px 80px rgba(20,43,33,0.18);
+    }
+    .hero .eyebrow {
+      display: inline-flex;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .hero h1 {
+      margin: 18px 0 10px;
+      font-family: "Cormorant Garamond", serif;
+      font-size: clamp(44px, 6vw, 68px);
+      line-height: 0.9;
+      letter-spacing: -0.03em;
+    }
+    .hero p {
+      margin: 0;
+      max-width: 58ch;
+      color: rgba(255,255,255,0.78);
+      line-height: 1.75;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(320px, 1.2fr) minmax(280px, 0.8fr);
+      gap: 18px;
+    }
+    .panel {
+      padding: 22px;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.78);
+      border: 1px solid rgba(23,49,39,0.08);
+      box-shadow: 0 20px 60px rgba(20,43,33,0.08);
+    }
+    .panel h2 {
+      margin: 0 0 14px;
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--forest);
+    }
+    .fields { display: grid; gap: 14px; }
+    .fields.two { grid-template-columns: 1fr 1fr; }
+    .field { display: grid; gap: 6px; }
+    label {
+      color: var(--forest);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid rgba(23,49,39,0.12);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.86);
+      color: var(--ink);
+      font: inherit;
+      line-height: 1.55;
+      resize: vertical;
+      outline: none;
+    }
+    textarea { min-height: 96px; }
+    .hint, .meta-copy { color: var(--ink-soft); font-size: 12px; line-height: 1.6; }
+    .result-url {
+      display: block;
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(34,74,58,0.06);
+      color: var(--forest-deep);
+      font-weight: 700;
+      word-break: break-all;
+      text-decoration: none;
+    }
+    .slug-preview {
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(185,135,69,0.1);
+      color: #6b4717;
+      font-size: 13px;
+      font-weight: 700;
+      word-break: break-all;
+    }
+    .actions {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    button {
+      appearance: none;
+      border: 0;
+      border-radius: 999px;
+      padding: 13px 16px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    button:disabled { opacity: 0.58; cursor: not-allowed; }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--forest-deep), var(--forest));
+      color: white;
+    }
+    .btn-secondary {
+      background: rgba(34,74,58,0.08);
+      color: var(--forest);
+      border: 1px solid rgba(34,74,58,0.1);
+    }
+    .status {
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(23,49,39,0.08);
+      color: var(--ink-soft);
+      font-size: 13px;
+      line-height: 1.65;
+      white-space: pre-wrap;
+    }
+    @media (max-width: 900px) {
+      .grid, .fields.two, .button-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <section class="hero">
+      <div class="eyebrow">Short URL Publisher</div>
+      <h1>짧은 링크로<br>피드백을 발행합니다.</h1>
+      <p>이 페이지는 로컬에서만 쓰는 발행기입니다. 입력 후 `짧은 URL 발행`을 누르면 정적 페이지를 만들고 GitHub Pages까지 push해서, `.../코딩쏙학원_이름_피드백/` 같은 짧은 주소를 만듭니다.</p>
+    </section>
+
+    <div class="grid">
+      <section class="panel">
+        <h2>피드백 입력</h2>
+        <div class="fields">
+          <div class="field">
+            <label for="slug">URL 이름</label>
+            <input id="slug" type="text" placeholder="예: 코딩쏙학원_김우현_피드백">
+            <div class="hint">비우면 학생 이름 기준으로 자동 생성됩니다.</div>
+          </div>
+        </div>
+
+        <div class="fields two">
+          <div class="field">
+            <label for="name">학생 이름</label>
+            <input id="name" type="text" placeholder="예: 김우현">
+          </div>
+          <div class="field">
+            <label for="date">수업일</label>
+            <input id="date" type="date">
+          </div>
+        </div>
+
+        <div class="fields">
+          <div class="field">
+            <label for="learn">오늘 배운 내용</label>
+            <textarea id="learn"></textarea>
+          </div>
+          <div class="field">
+            <label for="activities">세부 활동</label>
+            <textarea id="activities" placeholder="한 줄에 하나씩 입력하세요"></textarea>
+          </div>
+          <div class="field">
+            <label for="reaction">아이의 반응 및 태도</label>
+            <textarea id="reaction"></textarea>
+          </div>
+          <div class="field">
+            <label for="progress">이해도 및 진행 상황</label>
+            <textarea id="progress"></textarea>
+          </div>
+        </div>
+
+        <div class="fields two">
+          <div class="field">
+            <label for="homework">숙제</label>
+            <textarea id="homework"></textarea>
+          </div>
+          <div class="field">
+            <label for="next">다음 수업 계획</label>
+            <textarea id="next"></textarea>
+          </div>
+        </div>
+
+        <div class="fields">
+          <div class="field">
+            <label for="extra">추가 전달사항</label>
+            <textarea id="extra"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>발행 결과</h2>
+        <div class="meta-copy">현재 이 입력으로 만들어질 짧은 URL 이름입니다.</div>
+        <div class="slug-preview" id="slug-preview">코딩쏙학원_학생_피드백</div>
+
+        <div class="actions">
+          <button id="publish-btn" class="btn-primary" type="button">짧은 URL 발행</button>
+          <div class="button-row">
+            <button id="copy-btn" class="btn-secondary" type="button" disabled>링크 복사</button>
+            <button id="open-btn" class="btn-secondary" type="button" disabled>링크 열기</button>
+          </div>
+        </div>
+
+        <div class="status" id="status">아직 발행하지 않았습니다.</div>
+        <a class="result-url" id="result-url" href="#" hidden target="_blank" rel="noreferrer"></a>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const fields = {
+      slug: document.getElementById("slug"),
+      name: document.getElementById("name"),
+      date: document.getElementById("date"),
+      learn: document.getElementById("learn"),
+      activities: document.getElementById("activities"),
+      reaction: document.getElementById("reaction"),
+      progress: document.getElementById("progress"),
+      homework: document.getElementById("homework"),
+      next: document.getElementById("next"),
+      extra: document.getElementById("extra")
+    };
+
+    const slugPreview = document.getElementById("slug-preview");
+    const publishButton = document.getElementById("publish-btn");
+    const copyButton = document.getElementById("copy-btn");
+    const openButton = document.getElementById("open-btn");
+    const status = document.getElementById("status");
+    const resultUrl = document.getElementById("result-url");
+    let lastUrl = "";
+    let slugTouched = false;
+
+    function pad(number) {
+      return String(number).padStart(2, "0");
+    }
+
+    function setTodayIfEmpty() {
+      if (fields.date.value) return;
+      const now = new Date();
+      fields.date.value = now.getFullYear() + "-" + pad(now.getMonth() + 1) + "-" + pad(now.getDate());
+    }
+
+    function slugify(text) {
+      return String(text || "")
+        .trim()
+        .replace(/\\s+/g, "_")
+        .replace(/[\\\\/?#[\\]@!$&'()*+,;:=]+/g, "_")
+        .replace(/_+/g, "_")
+        .replace(/^_+|_+$/g, "");
+    }
+
+    function smartSlug() {
+      const manual = slugify(fields.slug.value);
+      if (manual) return manual;
+      const name = slugify(fields.name.value || "학생");
+      return "코딩쏙학원_" + name + "_피드백";
+    }
+
+    function syncSlug() {
+      if (slugTouched) return;
+      fields.slug.value = smartSlug();
+    }
+
+    function updateSlugPreview() {
+      slugPreview.textContent = smartSlug();
+    }
+
+    function getPayload() {
+      return {
+        slug: smartSlug(),
+        name: fields.name.value.trim(),
+        date: fields.date.value,
+        learn: fields.learn.value.trim(),
+        activities: fields.activities.value,
+        reaction: fields.reaction.value.trim(),
+        progress: fields.progress.value.trim(),
+        homework: fields.homework.value.trim(),
+        next: fields.next.value.trim(),
+        extra: fields.extra.value.trim()
+      };
+    }
+
+    async function publish() {
+      publishButton.disabled = true;
+      status.textContent = "발행 중입니다. 페이지 생성, git commit, git push를 순서대로 진행합니다.";
+
+      try {
+        const response = await fetch("/api/publish", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(getPayload())
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || "발행에 실패했습니다.");
+        }
+
+        lastUrl = data.url;
+        resultUrl.hidden = false;
+        resultUrl.href = data.url;
+        resultUrl.textContent = data.url;
+        copyButton.disabled = false;
+        openButton.disabled = false;
+        status.textContent = data.committed
+          ? "발행 완료되었습니다. GitHub Pages 반영 후 바로 링크를 열 수 있습니다."
+          : "페이지 내용이 기존과 동일해서 새 커밋 없이 URL만 반환했습니다.";
+      } catch (error) {
+        status.textContent = error.message;
+      } finally {
+        publishButton.disabled = false;
+      }
+    }
+
+    async function copyLink() {
+      if (!lastUrl) return;
+      try {
+        await navigator.clipboard.writeText(lastUrl);
+        status.textContent = "발행된 링크를 복사했습니다.";
+      } catch (error) {
+        status.textContent = "클립보드 복사에 실패했습니다.";
+      }
+    }
+
+    function openLink() {
+      if (!lastUrl) return;
+      window.open(lastUrl, "_blank", "noopener");
+    }
+
+    setTodayIfEmpty();
+    syncSlug();
+    updateSlugPreview();
+
+    fields.slug.addEventListener("input", () => {
+      slugTouched = Boolean(fields.slug.value.trim());
+      updateSlugPreview();
+    });
+
+    fields.name.addEventListener("input", () => {
+      syncSlug();
+      updateSlugPreview();
+    });
+
+    document.getElementById("publish-btn").addEventListener("click", publish);
+    document.getElementById("copy-btn").addEventListener("click", copyLink);
+    document.getElementById("open-btn").addEventListener("click", openLink);
+  </script>
+</body>
+</html>
