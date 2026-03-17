@@ -240,6 +240,30 @@
       flex-direction: column;
       justify-content: space-between;
       min-height: 240px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .welcome-panel > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .welcome-panel.has-photo {
+      background:
+        linear-gradient(180deg, rgba(10,18,34,0.14), rgba(10,18,34,0.62)),
+        var(--welcome-photo) center center / cover no-repeat;
+      border-color: rgba(255,255,255,0.18);
+      box-shadow: var(--shadow-md);
+    }
+
+    .welcome-panel.has-photo::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(10,18,34,0.08), rgba(10,18,34,0.36) 46%, rgba(10,18,34,0.8));
+      z-index: 0;
+      pointer-events: none;
     }
 
     .tag {
@@ -256,6 +280,14 @@
       color: var(--accent);
     }
 
+    .welcome-panel.has-photo .tag {
+      background: rgba(255,255,255,0.16);
+      border-color: rgba(255,255,255,0.2);
+      color: #FFFFFF;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
     .welcome-panel h2 {
       margin: 18px 0 8px;
       font-size: clamp(24px, 3vw, 36px);
@@ -264,11 +296,23 @@
       letter-spacing: -0.03em;
     }
 
+    .welcome-panel.has-photo h2 {
+      color: #FFFFFF;
+      text-shadow: 0 10px 28px rgba(0,0,0,0.3);
+      max-width: 10ch;
+    }
+
     .welcome-panel p {
       margin: 0;
       color: var(--text-muted);
       font-size: 13px;
       line-height: 1.7;
+    }
+
+    .welcome-panel.has-photo p {
+      color: rgba(255,255,255,0.86);
+      text-shadow: 0 8px 24px rgba(0,0,0,0.28);
+      max-width: 34ch;
     }
 
     .info-stack { display: grid; gap: 12px; }
