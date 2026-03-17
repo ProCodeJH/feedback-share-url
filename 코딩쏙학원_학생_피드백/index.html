@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>코딩쏙학원_학생_피드백</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #f4efe5;
+      --ink: #173127;
+      --ink-soft: #597063;
+      --forest: #224a3a;
+      --forest-deep: #142b21;
+      --gold: #b98745;
+      --line: rgba(23,49,39,0.1);
+      --shadow: 0 28px 90px rgba(20,43,33,0.16);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+
+    body {
+      font-family: "Noto Sans KR", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(185,135,69,0.22), transparent 28%),
+        radial-gradient(circle at top right, rgba(34,74,58,0.18), transparent 32%),
+        linear-gradient(180deg, #e8dfd0 0%, var(--paper) 44%, #ece4d8 100%);
+    }
+
+    .shell {
+      min-height: 100vh;
+      padding: 22px;
+    }
+
+    .viewer-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      max-width: 980px;
+      margin: 0 auto 16px;
+      padding: 0 8px;
+    }
+
+    .viewer-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink-soft);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .page-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 88px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(34,74,58,0.08);
+      color: var(--forest);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .viewer-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    button {
+      appearance: none;
+      border: 0;
+      border-radius: 999px;
+      padding: 13px 16px;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      background: rgba(34,74,58,0.08);
+      color: var(--forest);
+      border: 1px solid rgba(34,74,58,0.1);
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .sheet {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 28px;
+      border-radius: 34px;
+      background: rgba(255,255,255,0.78);
+      border: 1px solid rgba(23,49,39,0.08);
+      box-shadow: var(--shadow);
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.is-active {
+      display: block;
+    }
+
+    .cover-page {
+      min-height: 640px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(28px, 5vw, 56px);
+    }
+
+    .cover-card {
+      width: 100%;
+      max-width: 760px;
+      padding: clamp(28px, 5vw, 52px);
+      border-radius: 32px;
+      background: linear-gradient(145deg, rgba(20,43,33,0.98), rgba(34,74,58,0.94));
+      color: white;
+      text-align: center;
+      box-shadow: 0 26px 70px rgba(20,43,33,0.22);
+    }
+
+    .cover-logo-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+
+    .cover-logo {
+      width: min(240px, 52vw);
+      max-width: 240px;
+      height: auto;
+      filter: drop-shadow(0 18px 30px rgba(0,0,0,0.18));
+    }
+
+    .cover-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .cover-kicker::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f0c27b, #c7954d);
+    }
+
+    .cover-title {
+      margin: 22px 0 14px;
+      font-family: "Cormorant Garamond", serif;
+      font-size: clamp(46px, 6vw, 70px);
+      line-height: 0.9;
+      letter-spacing: -0.03em;
+    }
+
+    .cover-message {
+      margin: 0 auto;
+      max-width: 24ch;
+      font-size: clamp(22px, 3.1vw, 34px);
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .cover-message strong {
+      color: #f2c98c;
+    }
+
+    .cover-sub {
+      margin: 18px auto 0;
+      max-width: 42ch;
+      color: rgba(255,255,255,0.74);
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .page-section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .page-title {
+      color: var(--forest);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .page-copy {
+      color: var(--ink-soft);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .date-chip {
+      padding: 11px 14px;
+      border-radius: 18px;
+      background: rgba(185,135,69,0.12);
+      color: #6b4717;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .mini-summary,
+    .slug-box,
+    .focus-box,
+    .card {
+      padding: 20px;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.74);
+      border: 1px solid rgba(23,49,39,0.08);
+    }
+
+    .mini-summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 18px;
+      background: rgba(34,74,58,0.06);
+    }
+
+    .mini-summary strong,
+    .slug-box strong,
+    .focus-box strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--forest);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .mini-name {
+      color: var(--ink);
+      font-family: "Cormorant Garamond", serif;
+      font-size: 32px;
+      line-height: 0.95;
+    }
+
+    .mini-text,
+    .slug-box div,
+    .focus-box p,
+    .body-text,
+    .list li {
+      color: var(--ink-soft);
+      font-size: 14px;
+      line-height: 1.8;
+      margin: 0;
+      white-space: pre-wrap;
+      word-break: keep-all;
+    }
+
+    .detail-top,
+    .grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .card {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+      min-height: 176px;
+    }
+
+    .card.span-2 {
+      grid-column: span 2;
+    }
+
+    .index {
+      color: rgba(185,135,69,0.92);
+      font-family: "Cormorant Garamond", serif;
+      font-size: 34px;
+      line-height: 1;
+    }
+
+    .card h3 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 12px;
+    }
+
+    .foot {
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      color: var(--ink-soft);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .brand {
+      color: var(--forest);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 900px) {
+      .viewer-nav,
+      .page-section-head,
+      .mini-summary,
+      .foot {
+        flex-direction: column;
+        align-items: start;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card.span-2 {
+        grid-column: span 1;
+      }
+
+      .viewer-buttons {
+        width: 100%;
+      }
+
+      .viewer-buttons button {
+        flex: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="viewer-nav">
+      <div class="viewer-meta">
+        <div class="page-pill" id="page-pill">PAGE 1 / 2</div>
+        <div id="page-caption">첫 페이지는 안내 표지이고, 다음 버튼을 누르면 실제 피드백이 열립니다.</div>
+      </div>
+      <div class="viewer-buttons">
+        <button id="btn-prev-page" type="button">이전 페이지</button>
+        <button id="btn-next-page" type="button">피드백 보기</button>
+      </div>
+    </div>
+
+    <article class="sheet">
+      <section class="page is-active" data-page="1">
+        <section class="cover-page">
+          <div class="cover-card">
+            <div class="cover-logo-wrap">
+              <img class="cover-logo" src="../logo.png" alt="코딩쏙 학원 로고">
+            </div>
+            <div class="cover-kicker">Class Feedback Notice</div>
+            <h2 class="cover-title">학부모님<br>안녕하세요.</h2>
+            <p class="cover-message">코딩쏙 학원입니다.<br><strong>김우현 학생</strong>의 오늘의 수업 피드백 안내드립니다.</p>
+            <p class="cover-sub">2026년 3월 17일 수업 내용을 다음 페이지에서 확인하실 수 있습니다.</p>
+          </div>
+        </section>
+      </section>
+
+      <section class="page" data-page="2">
+        <div class="page-section-head">
+          <div>
+            <div class="page-title">Feedback Details</div>
+            <div class="page-copy">실제 수업 피드백 내용을 이 페이지에서 이어서 확인합니다.</div>
+          </div>
+          <div class="date-chip">2026년 3월 17일</div>
+        </div>
+
+        <div class="mini-summary">
+          <div>
+            <strong>Student</strong>
+            <div class="mini-name">김우현</div>
+          </div>
+          <div class="mini-text">첫 페이지에서 안내를 확인한 뒤, 이 페이지에서 실제 수업 피드백 내용을 이어서 봅니다.</div>
+        </div>
+
+        <div class="detail-top">
+          <div class="slug-box">
+            <strong>URL Name</strong>
+            <div>코딩쏙학원_학생_피드백</div>
+          </div>
+          <div class="focus-box">
+            <strong>Today Focus</strong>
+            <p>아이아이</p>
+          </div>
+        </div>
+
+        <section class="grid">
+          <section class="card">
+            <div class="index">01</div>
+            <h3>세부 활동</h3>
+            <ul class="list">
+              <li>ㅁㄴㅇㅁㄴㅇ</li>
+            </ul>
+          </section>
+
+          <section class="card">
+            <div class="index">02</div>
+            <h3>아이의 반응 및 태도</h3>
+            <p class="body-text">ㅁㄴㅇ</p>
+          </section>
+
+          <section class="card">
+            <div class="index">03</div>
+            <h3>이해도 및 진행 상황</h3>
+            <p class="body-text">ㅁㄴㅇㅁㄴㅇ</p>
+          </section>
+
+          <section class="card">
+            <div class="index">04</div>
+            <h3>숙제</h3>
+            <p class="body-text">ㅁㄴㅇ</p>
+          </section>
+
+          <section class="card span-2">
+            <div class="index">05</div>
+            <h3>다음 수업 계획</h3>
+            <p class="body-text">ㅁㄴㅇ</p>
+          </section>
+
+          <section class="card span-2">
+            <div class="index">06</div>
+            <h3>추가 전달사항</h3>
+            <p class="body-text">ㅁㄴㅇㅁ</p>
+          </section>
+        </section>
+
+        <footer class="foot">
+          <div class="brand">Class Feedback Letter</div>
+          <div>코딩쏙 학원 수업 피드백 안내 페이지입니다.</div>
+        </footer>
+      </section>
+    </article>
+  </div>
+
+  <script>
+    const pages = Array.from(document.querySelectorAll(".page"));
+    const pagePill = document.getElementById("page-pill");
+    const pageCaption = document.getElementById("page-caption");
+    const prevButton = document.getElementById("btn-prev-page");
+    const nextButton = document.getElementById("btn-next-page");
+    let currentPage = 1;
+
+    function updatePage(page) {
+      currentPage = Math.max(1, Math.min(2, page));
+      pages.forEach((section) => {
+        section.classList.toggle("is-active", Number(section.dataset.page) === currentPage);
+      });
+      pagePill.textContent = "PAGE " + currentPage + " / 2";
+      pageCaption.textContent = currentPage === 1
+        ? "첫 페이지는 안내 표지이고, 다음 버튼을 누르면 실제 피드백이 열립니다."
+        : "둘째 페이지에서 실제 피드백 내용을 이어서 봅니다.";
+      prevButton.disabled = currentPage === 1;
+      nextButton.disabled = currentPage === 2;
+      prevButton.textContent = currentPage === 1 ? "이전 페이지" : "첫 페이지로";
+      nextButton.textContent = currentPage === 1 ? "피드백 보기" : "마지막 페이지";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    prevButton.addEventListener("click", () => updatePage(currentPage - 1));
+    nextButton.addEventListener("click", () => updatePage(currentPage + 1));
+    updatePage(1);
+  </script>
+</body>
+</html>
