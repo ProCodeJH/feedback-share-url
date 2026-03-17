@@ -3,9 +3,11 @@ import path from "node:path";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { publishFeedbackPage } from "./publish-feedback-page.mjs";
+import { renderFeedbackPageHtml } from "./render-feedback-page.mjs";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const adminFile = path.join(repoRoot, "publisher", "index.html");
+const logoFile = path.join(repoRoot, "logo.png");
 const port = Number(process.env.PORT || 4317);
 
 function sendJson(response, statusCode, payload) {
@@ -42,8 +44,23 @@ const server = http.createServer(async (request, response) => {
       return;
     }
 
+    if (request.method === "GET" && url.pathname === "/logo.png") {
+      const image = await readFile(logoFile);
+      response.writeHead(200, { "Content-Type": "image/png", "Cache-Control": "no-store" });
+      response.end(image);
+      return;
+    }
+
     if (request.method === "GET" && url.pathname === "/api/health") {
       sendJson(response, 200, { ok: true });
+      return;
+    }
+
+    if (request.method === "POST" && url.pathname === "/api/preview") {
+      const rawBody = await collectRequestBody(request);
+      const payload = JSON.parse(rawBody || "{}");
+      const html = renderFeedbackPageHtml(payload, { logoSrc: "/logo.png" });
+      sendText(response, 200, "text/html; charset=utf-8", html);
       return;
     }
 

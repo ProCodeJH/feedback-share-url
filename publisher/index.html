@@ -3,86 +3,197 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>피드백 발행기</title>
+  <title>코딩쏙 피드백 발행 스튜디오</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --paper: #f4efe5;
+      --bg: #f5efe5;
+      --bg-deep: #e9ddca;
       --ink: #173127;
-      --ink-soft: #597063;
-      --forest: #224a3a;
-      --forest-deep: #142b21;
-      --gold: #b98745;
+      --ink-soft: #60776b;
+      --forest: #204839;
+      --forest-deep: #11241d;
+      --gold: #bb8b4f;
+      --gold-soft: rgba(187, 139, 79, 0.14);
+      --line: rgba(23, 49, 39, 0.1);
+      --panel: rgba(255, 252, 247, 0.78);
+      --shadow: 0 28px 90px rgba(17, 36, 29, 0.16);
+      --radius-xl: 30px;
+      --radius-lg: 24px;
+      --radius-md: 16px;
     }
+
     * { box-sizing: border-box; }
     html, body { margin: 0; min-height: 100%; }
+
     body {
       font-family: "Noto Sans KR", sans-serif;
       color: var(--ink);
       background:
-        radial-gradient(circle at top left, rgba(185,135,69,0.22), transparent 28%),
-        radial-gradient(circle at top right, rgba(34,74,58,0.18), transparent 32%),
-        linear-gradient(180deg, #e8dfd0 0%, var(--paper) 44%, #ece4d8 100%);
+        radial-gradient(circle at top left, rgba(187, 139, 79, 0.22), transparent 30%),
+        radial-gradient(circle at top right, rgba(32, 72, 57, 0.18), transparent 32%),
+        linear-gradient(180deg, var(--bg-deep) 0%, var(--bg) 46%, #efe7db 100%);
     }
-    .shell {
-      max-width: 1040px;
-      margin: 0 auto;
-      padding: 28px 18px 42px;
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(rgba(255,255,255,0.14) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.14) 1px, transparent 1px);
+      background-size: 26px 26px;
+      opacity: 0.18;
+      mix-blend-mode: soft-light;
     }
+
+    .app {
+      position: relative;
+      min-height: 100vh;
+      padding: 22px;
+      display: grid;
+      grid-template-columns: minmax(360px, 430px) 1fr;
+      gap: 20px;
+    }
+
+    .composer {
+      position: sticky;
+      top: 22px;
+      align-self: start;
+      max-height: calc(100vh - 44px);
+      overflow: auto;
+      padding: 24px 22px 22px;
+      border-radius: var(--radius-xl);
+      background: rgba(255, 252, 247, 0.8);
+      border: 1px solid rgba(23, 49, 39, 0.08);
+      backdrop-filter: blur(16px);
+      box-shadow: var(--shadow);
+    }
+
+    .preview-stage {
+      min-width: 0;
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+
     .hero {
-      margin-bottom: 18px;
       padding: 28px;
-      border-radius: 28px;
-      background: linear-gradient(145deg, rgba(20,43,33,0.98), rgba(34,74,58,0.94));
+      border-radius: var(--radius-xl);
+      background:
+        radial-gradient(circle at top, rgba(255,255,255,0.08), transparent 28%),
+        linear-gradient(145deg, rgba(17, 36, 29, 0.98), rgba(32, 72, 57, 0.94));
       color: white;
-      box-shadow: 0 24px 80px rgba(20,43,33,0.18);
+      box-shadow: 0 32px 90px rgba(17, 36, 29, 0.22);
     }
-    .hero .eyebrow {
+
+    .eyebrow {
       display: inline-flex;
+      align-items: center;
+      gap: 10px;
       padding: 8px 14px;
       border-radius: 999px;
       background: rgba(255,255,255,0.08);
       font-size: 12px;
       font-weight: 700;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
     }
+
+    .eyebrow::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f2c98c, #c9964d);
+      box-shadow: 0 0 0 6px rgba(242, 201, 140, 0.14);
+    }
+
     .hero h1 {
       margin: 18px 0 10px;
       font-family: "Cormorant Garamond", serif;
-      font-size: clamp(44px, 6vw, 68px);
-      line-height: 0.9;
-      letter-spacing: -0.03em;
+      font-size: clamp(44px, 5vw, 68px);
+      line-height: 0.88;
+      letter-spacing: -0.04em;
     }
+
     .hero p {
       margin: 0;
-      max-width: 58ch;
-      color: rgba(255,255,255,0.78);
-      line-height: 1.75;
+      max-width: 56ch;
+      color: rgba(255,255,255,0.76);
+      line-height: 1.78;
     }
-    .grid {
+
+    .meta-grid {
       display: grid;
-      grid-template-columns: minmax(320px, 1.2fr) minmax(280px, 0.8fr);
-      gap: 18px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
     }
-    .panel {
-      padding: 22px;
-      border-radius: 24px;
-      background: rgba(255,255,255,0.78);
-      border: 1px solid rgba(23,49,39,0.08);
-      box-shadow: 0 20px 60px rgba(20,43,33,0.08);
+
+    .meta-card {
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.08);
     }
-    .panel h2 {
+
+    .meta-card strong {
+      display: block;
+      margin-bottom: 8px;
+      color: rgba(255,255,255,0.68);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .meta-card span {
+      display: block;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    h2 {
       margin: 0 0 14px;
+      color: var(--forest);
       font-size: 18px;
       font-weight: 800;
-      color: var(--forest);
+      letter-spacing: -0.02em;
     }
-    .fields { display: grid; gap: 14px; }
-    .fields.two { grid-template-columns: 1fr 1fr; }
-    .field { display: grid; gap: 6px; }
+
+    .form-block,
+    .side-panel,
+    .preview-card {
+      padding: 22px;
+      border-radius: var(--radius-lg);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: 0 18px 60px rgba(17, 36, 29, 0.08);
+    }
+
+    .composer-stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    .fields {
+      display: grid;
+      gap: 14px;
+    }
+
+    .fields.two {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
     label {
       color: var(--forest);
       font-size: 12px;
@@ -90,50 +201,61 @@
       letter-spacing: 0.06em;
       text-transform: uppercase;
     }
-    input, textarea {
+
+    input,
+    textarea {
       width: 100%;
       padding: 13px 14px;
-      border: 1px solid rgba(23,49,39,0.12);
-      border-radius: 16px;
-      background: rgba(255,255,255,0.86);
+      border: 1px solid rgba(23, 49, 39, 0.12);
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,0.9);
       color: var(--ink);
       font: inherit;
       line-height: 1.55;
       resize: vertical;
       outline: none;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
     }
+
+    input:focus,
+    textarea:focus {
+      border-color: rgba(32, 72, 57, 0.42);
+      box-shadow: 0 0 0 4px rgba(32, 72, 57, 0.08);
+      transform: translateY(-1px);
+    }
+
     textarea { min-height: 96px; }
-    .hint, .meta-copy { color: var(--ink-soft); font-size: 12px; line-height: 1.6; }
-    .result-url {
-      display: block;
-      margin-top: 12px;
-      padding: 14px;
-      border-radius: 16px;
-      background: rgba(34,74,58,0.06);
-      color: var(--forest-deep);
-      font-weight: 700;
-      word-break: break-all;
-      text-decoration: none;
+
+    .hint,
+    .muted {
+      color: var(--ink-soft);
+      font-size: 12px;
+      line-height: 1.65;
     }
+
     .slug-preview {
+      margin-top: 10px;
       padding: 14px;
       border-radius: 16px;
-      background: rgba(185,135,69,0.1);
-      color: #6b4717;
+      background: var(--gold-soft);
+      color: #6d4a1f;
       font-size: 13px;
       font-weight: 700;
       word-break: break-all;
     }
+
     .actions {
       display: grid;
       gap: 10px;
       margin-top: 16px;
     }
+
     .button-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
     }
+
     button {
       appearance: none;
       border: 0;
@@ -142,118 +264,240 @@
       font: inherit;
       font-weight: 800;
       cursor: pointer;
+      transition: transform 0.18s ease, opacity 0.18s ease;
     }
-    button:disabled { opacity: 0.58; cursor: not-allowed; }
+
+    button:hover { transform: translateY(-1px); }
+    button:disabled { opacity: 0.58; cursor: not-allowed; transform: none; }
+
     .btn-primary {
       background: linear-gradient(135deg, var(--forest-deep), var(--forest));
       color: white;
+      box-shadow: 0 18px 36px rgba(17, 36, 29, 0.16);
     }
+
     .btn-secondary {
-      background: rgba(34,74,58,0.08);
+      background: rgba(32, 72, 57, 0.08);
       color: var(--forest);
-      border: 1px solid rgba(34,74,58,0.1);
+      border: 1px solid rgba(32, 72, 57, 0.1);
     }
+
     .status {
       margin-top: 14px;
       padding: 14px;
       border-radius: 16px;
-      background: rgba(255,255,255,0.82);
-      border: 1px solid rgba(23,49,39,0.08);
+      background: rgba(255,255,255,0.86);
+      border: 1px solid var(--line);
       color: var(--ink-soft);
       font-size: 13px;
       line-height: 1.65;
       white-space: pre-wrap;
     }
+
+    .result-url {
+      display: block;
+      margin-top: 12px;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(32, 72, 57, 0.06);
+      color: var(--forest-deep);
+      font-weight: 700;
+      text-decoration: none;
+      word-break: break-all;
+    }
+
+    .preview-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 14px;
+    }
+
+    .preview-top .title {
+      color: var(--forest);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .preview-frame {
+      position: relative;
+      width: 100%;
+      min-height: 980px;
+      border: 1px solid rgba(23, 49, 39, 0.08);
+      border-radius: 26px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #f8f3ea, #f0e8dc);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.3);
+    }
+
+    iframe {
+      width: 100%;
+      height: 980px;
+      border: 0;
+      background: transparent;
+    }
+
+    .preview-loading {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      background: rgba(248, 243, 234, 0.72);
+      color: var(--ink-soft);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: opacity 0.18s ease;
+      pointer-events: none;
+    }
+
+    .preview-loading.hidden {
+      opacity: 0;
+    }
+
+    @media (max-width: 1180px) {
+      .app { grid-template-columns: 1fr; }
+      .composer { position: static; max-height: none; }
+    }
+
     @media (max-width: 900px) {
-      .grid, .fields.two, .button-row { grid-template-columns: 1fr; }
+      .fields.two,
+      .button-row,
+      .meta-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .preview-top {
+        flex-direction: column;
+        align-items: start;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="shell">
-    <section class="hero">
-      <div class="eyebrow">Short URL Publisher</div>
-      <h1>짧은 링크로<br>피드백을 발행합니다.</h1>
-      <p>이 페이지는 로컬에서만 쓰는 발행기입니다. 입력 후 `짧은 URL 발행`을 누르면 정적 페이지를 만들고 GitHub Pages까지 push해서, `.../코딩쏙학원_이름_피드백/` 같은 짧은 주소를 만듭니다.</p>
-    </section>
+  <div class="app">
+    <aside class="composer">
+      <div class="composer-stack">
+        <section class="form-block">
+          <h2>피드백 작성</h2>
 
-    <div class="grid">
-      <section class="panel">
-        <h2>피드백 입력</h2>
-        <div class="fields">
-          <div class="field">
-            <label for="slug">URL 이름</label>
-            <input id="slug" type="text" placeholder="예: 코딩쏙학원_김우현_피드백">
-            <div class="hint">비우면 학생 이름 기준으로 자동 생성됩니다.</div>
+          <div class="fields">
+            <div class="field">
+              <label for="slug">URL 이름</label>
+              <input id="slug" type="text" placeholder="예: 코딩쏙학원_김우현_피드백">
+              <div class="hint">비우면 학생 이름 기준으로 자동 생성됩니다.</div>
+            </div>
           </div>
-        </div>
 
-        <div class="fields two">
-          <div class="field">
-            <label for="name">학생 이름</label>
-            <input id="name" type="text" placeholder="예: 김우현">
-          </div>
-          <div class="field">
-            <label for="date">수업일</label>
-            <input id="date" type="date">
-          </div>
-        </div>
+          <div class="slug-preview" id="slug-preview">코딩쏙학원_학생_피드백</div>
 
-        <div class="fields">
-          <div class="field">
-            <label for="learn">오늘 배운 내용</label>
-            <textarea id="learn"></textarea>
+          <div class="fields two" style="margin-top: 14px;">
+            <div class="field">
+              <label for="name">학생 이름</label>
+              <input id="name" type="text" placeholder="예: 김우현">
+            </div>
+            <div class="field">
+              <label for="date">수업일</label>
+              <input id="date" type="date">
+            </div>
           </div>
-          <div class="field">
-            <label for="activities">세부 활동</label>
-            <textarea id="activities" placeholder="한 줄에 하나씩 입력하세요"></textarea>
-          </div>
-          <div class="field">
-            <label for="reaction">아이의 반응 및 태도</label>
-            <textarea id="reaction"></textarea>
-          </div>
-          <div class="field">
-            <label for="progress">이해도 및 진행 상황</label>
-            <textarea id="progress"></textarea>
-          </div>
-        </div>
 
-        <div class="fields two">
-          <div class="field">
-            <label for="homework">숙제</label>
-            <textarea id="homework"></textarea>
+          <div class="fields" style="margin-top: 14px;">
+            <div class="field">
+              <label for="learn">오늘 배운 내용</label>
+              <textarea id="learn" placeholder="오늘 수업의 핵심 포인트를 입력하세요"></textarea>
+            </div>
+            <div class="field">
+              <label for="activities">세부 활동</label>
+              <textarea id="activities" placeholder="한 줄에 하나씩 입력하세요"></textarea>
+            </div>
+            <div class="field">
+              <label for="reaction">아이의 반응 및 태도</label>
+              <textarea id="reaction"></textarea>
+            </div>
+            <div class="field">
+              <label for="progress">이해도 및 진행 상황</label>
+              <textarea id="progress"></textarea>
+            </div>
           </div>
-          <div class="field">
-            <label for="next">다음 수업 계획</label>
-            <textarea id="next"></textarea>
-          </div>
-        </div>
 
-        <div class="fields">
-          <div class="field">
-            <label for="extra">추가 전달사항</label>
-            <textarea id="extra"></textarea>
+          <div class="fields two" style="margin-top: 14px;">
+            <div class="field">
+              <label for="homework">숙제</label>
+              <textarea id="homework"></textarea>
+            </div>
+            <div class="field">
+              <label for="next">다음 수업 계획</label>
+              <textarea id="next"></textarea>
+            </div>
+          </div>
+
+          <div class="fields" style="margin-top: 14px;">
+            <div class="field">
+              <label for="extra">추가 전달사항</label>
+              <textarea id="extra"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <section class="side-panel">
+          <h2>짧은 URL 발행</h2>
+          <div class="muted">이 페이지에서 바로 미리보기를 확인한 뒤, 같은 디자인으로 정적 페이지를 발행합니다. 긴 쿼리 링크가 아니라 실제 짧은 경로 URL을 만듭니다.</div>
+
+          <div class="actions">
+            <button id="publish-btn" class="btn-primary" type="button">짧은 URL 발행</button>
+            <div class="button-row">
+              <button id="copy-btn" class="btn-secondary" type="button" disabled>링크 복사</button>
+              <button id="open-btn" class="btn-secondary" type="button" disabled>링크 열기</button>
+            </div>
+          </div>
+
+          <div class="status" id="status">아직 발행하지 않았습니다. 오른쪽 미리보기가 실제 발행 결과와 동일한 템플릿입니다.</div>
+          <a class="result-url" id="result-url" href="#" hidden target="_blank" rel="noreferrer"></a>
+        </section>
+      </div>
+    </aside>
+
+    <main class="preview-stage">
+      <section class="hero">
+        <div class="eyebrow">Feedback Studio</div>
+        <h1>작성, 미리보기,<br>짧은 링크 발행을 한 화면에서.</h1>
+        <p>실제 발행될 2페이지 피드백 페이지를 그대로 우측에서 라이브로 보여주고, 같은 데이터로 GitHub Pages에 정적 페이지를 발행합니다. 미리보기와 결과물이 달라지는 문제를 줄인 구조입니다.</p>
+
+        <div class="meta-grid">
+          <div class="meta-card">
+            <strong>Flow</strong>
+            <span>작성 → live preview → 짧은 URL 발행</span>
+          </div>
+          <div class="meta-card">
+            <strong>URL</strong>
+            <span id="hero-slug">코딩쏙학원_학생_피드백</span>
+          </div>
+          <div class="meta-card">
+            <strong>Parity</strong>
+            <span>미리보기와 발행 HTML을 같은 렌더러로 맞춥니다</span>
           </div>
         </div>
       </section>
 
-      <section class="panel">
-        <h2>발행 결과</h2>
-        <div class="meta-copy">현재 이 입력으로 만들어질 짧은 URL 이름입니다.</div>
-        <div class="slug-preview" id="slug-preview">코딩쏙학원_학생_피드백</div>
-
-        <div class="actions">
-          <button id="publish-btn" class="btn-primary" type="button">짧은 URL 발행</button>
-          <div class="button-row">
-            <button id="copy-btn" class="btn-secondary" type="button" disabled>링크 복사</button>
-            <button id="open-btn" class="btn-secondary" type="button" disabled>링크 열기</button>
+      <section class="preview-card">
+        <div class="preview-top">
+          <div>
+            <div class="title">Live Preview</div>
+            <div class="muted">아래 프리뷰는 실제 짧은 URL 페이지와 같은 HTML 렌더러로 생성됩니다.</div>
           </div>
+          <div class="muted" id="preview-meta">입력값을 수정하면 잠시 후 자동으로 반영됩니다.</div>
         </div>
 
-        <div class="status" id="status">아직 발행하지 않았습니다.</div>
-        <a class="result-url" id="result-url" href="#" hidden target="_blank" rel="noreferrer"></a>
+        <div class="preview-frame">
+          <iframe id="preview-frame" title="피드백 미리보기"></iframe>
+          <div class="preview-loading" id="preview-loading">Rendering Preview</div>
+        </div>
       </section>
-    </div>
+    </main>
   </div>
 
   <script>
@@ -271,13 +515,20 @@
     };
 
     const slugPreview = document.getElementById("slug-preview");
+    const heroSlug = document.getElementById("hero-slug");
     const publishButton = document.getElementById("publish-btn");
     const copyButton = document.getElementById("copy-btn");
     const openButton = document.getElementById("open-btn");
     const status = document.getElementById("status");
     const resultUrl = document.getElementById("result-url");
-    let lastUrl = "";
+    const previewFrame = document.getElementById("preview-frame");
+    const previewLoading = document.getElementById("preview-loading");
+    const previewMeta = document.getElementById("preview-meta");
+
     let slugTouched = false;
+    let lastUrl = "";
+    let previewTimer = null;
+    let previewController = null;
 
     function pad(number) {
       return String(number).padStart(2, "0");
@@ -293,7 +544,7 @@
       return String(text || "")
         .trim()
         .replace(/\\s+/g, "_")
-        .replace(/[\\\\/?#[\\]@!$&'()*+,;:=]+/g, "_")
+        .replace(/[\\/?#[\]@!$&'()*+,;:=]+/g, "_")
         .replace(/_+/g, "_")
         .replace(/^_+|_+$/g, "");
     }
@@ -310,8 +561,10 @@
       fields.slug.value = smartSlug();
     }
 
-    function updateSlugPreview() {
-      slugPreview.textContent = smartSlug();
+    function updateSlugUI() {
+      const slug = smartSlug();
+      slugPreview.textContent = slug;
+      heroSlug.textContent = slug;
     }
 
     function getPayload() {
@@ -329,9 +582,55 @@
       };
     }
 
+    async function renderPreview() {
+      if (previewController) {
+        previewController.abort();
+      }
+
+      previewController = new AbortController();
+      previewLoading.classList.remove("hidden");
+      previewMeta.textContent = "실제 발행 결과와 같은 템플릿으로 렌더링 중입니다.";
+
+      try {
+        const response = await fetch("/api/preview", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(getPayload()),
+          signal: previewController.signal
+        });
+
+        const html = await response.text();
+        if (!response.ok) {
+          throw new Error(html || "미리보기를 불러오지 못했습니다.");
+        }
+
+        previewFrame.srcdoc = html;
+        previewMeta.textContent = "미리보기와 발행 페이지는 같은 렌더러를 사용합니다.";
+      } catch (error) {
+        if (error.name === "AbortError") return;
+        previewFrame.srcdoc = "<!DOCTYPE html><html lang='ko'><body style='font-family:sans-serif;padding:24px'>미리보기를 렌더링하지 못했습니다.</body></html>";
+        previewMeta.textContent = "미리보기 렌더링 중 오류가 발생했습니다.";
+      } finally {
+        previewLoading.classList.add("hidden");
+      }
+    }
+
+    function schedulePreview() {
+      updateSlugUI();
+      previewLoading.classList.remove("hidden");
+
+      if (previewTimer) {
+        clearTimeout(previewTimer);
+      }
+
+      previewTimer = setTimeout(() => {
+        renderPreview();
+      }, 180);
+    }
+
     async function publish() {
       publishButton.disabled = true;
-      status.textContent = "발행 중입니다. 페이지 생성, git commit, git push를 순서대로 진행합니다.";
+      status.textContent = "발행 중입니다. 정적 페이지 생성, git commit, git push를 차례대로 진행합니다.";
 
       try {
         const response = await fetch("/api/publish", {
@@ -353,7 +652,7 @@
         openButton.disabled = false;
         status.textContent = data.committed
           ? "발행 완료되었습니다. GitHub Pages 반영 후 바로 링크를 열 수 있습니다."
-          : "페이지 내용이 기존과 동일해서 새 커밋 없이 URL만 반환했습니다.";
+          : "기존 내용과 동일하여 새 커밋 없이 URL만 반환했습니다.";
       } catch (error) {
         status.textContent = error.message;
       } finally {
@@ -378,21 +677,28 @@
 
     setTodayIfEmpty();
     syncSlug();
-    updateSlugPreview();
+    updateSlugUI();
+    schedulePreview();
 
     fields.slug.addEventListener("input", () => {
       slugTouched = Boolean(fields.slug.value.trim());
-      updateSlugPreview();
+      schedulePreview();
     });
 
     fields.name.addEventListener("input", () => {
       syncSlug();
-      updateSlugPreview();
+      schedulePreview();
     });
 
-    document.getElementById("publish-btn").addEventListener("click", publish);
-    document.getElementById("copy-btn").addEventListener("click", copyLink);
-    document.getElementById("open-btn").addEventListener("click", openLink);
+    Object.entries(fields).forEach(([key, field]) => {
+      if (key === "slug" || key === "name") return;
+      field.addEventListener("input", schedulePreview);
+      field.addEventListener("change", schedulePreview);
+    });
+
+    publishButton.addEventListener("click", publish);
+    copyButton.addEventListener("click", copyLink);
+    openButton.addEventListener("click", openLink);
   </script>
 </body>
 </html>
