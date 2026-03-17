@@ -18,10 +18,8 @@
       --line: rgba(23,49,39,0.1);
       --shadow: 0 28px 90px rgba(20,43,33,0.16);
     }
-
     * { box-sizing: border-box; }
     html, body { margin: 0; min-height: 100%; }
-
     body {
       font-family: "Noto Sans KR", sans-serif;
       color: var(--ink);
@@ -30,12 +28,7 @@
         radial-gradient(circle at top right, rgba(34,74,58,0.18), transparent 32%),
         linear-gradient(180deg, #e8dfd0 0%, var(--paper) 44%, #ece4d8 100%);
     }
-
-    .shell {
-      min-height: 100vh;
-      padding: 22px;
-    }
-
+    .shell { min-height: 100vh; padding: 22px; }
     .viewer-nav {
       display: flex;
       justify-content: space-between;
@@ -45,7 +38,6 @@
       margin: 0 auto 16px;
       padding: 0 8px;
     }
-
     .viewer-meta {
       display: flex;
       align-items: center;
@@ -54,7 +46,6 @@
       font-size: 12px;
       font-weight: 700;
     }
-
     .page-pill {
       display: inline-flex;
       align-items: center;
@@ -69,15 +60,10 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
-
-    .viewer-buttons {
-      display: flex;
-      gap: 8px;
-    }
-
+    .viewer-buttons { display: flex; gap: 8px; }
     button {
       appearance: none;
-      border: 0;
+      border: 1px solid rgba(34,74,58,0.1);
       border-radius: 999px;
       padding: 13px 16px;
       font: inherit;
@@ -85,14 +71,8 @@
       cursor: pointer;
       background: rgba(34,74,58,0.08);
       color: var(--forest);
-      border: 1px solid rgba(34,74,58,0.1);
     }
-
-    button:disabled {
-      opacity: 0.55;
-      cursor: not-allowed;
-    }
-
+    button:disabled { opacity: 0.55; cursor: not-allowed; }
     .sheet {
       max-width: 980px;
       margin: 0 auto;
@@ -102,15 +82,8 @@
       border: 1px solid rgba(23,49,39,0.08);
       box-shadow: var(--shadow);
     }
-
-    .page {
-      display: none;
-    }
-
-    .page.is-active {
-      display: block;
-    }
-
+    .page { display: none; }
+    .page.is-active { display: block; }
     .cover-page {
       min-height: 640px;
       display: flex;
@@ -118,7 +91,6 @@
       justify-content: center;
       padding: clamp(28px, 5vw, 56px);
     }
-
     .cover-card {
       width: 100%;
       max-width: 760px;
@@ -129,20 +101,17 @@
       text-align: center;
       box-shadow: 0 26px 70px rgba(20,43,33,0.22);
     }
-
     .cover-logo-wrap {
       display: flex;
       justify-content: center;
       margin-bottom: 24px;
     }
-
     .cover-logo {
       width: min(240px, 52vw);
       max-width: 240px;
       height: auto;
       filter: drop-shadow(0 18px 30px rgba(0,0,0,0.18));
     }
-
     .cover-kicker {
       display: inline-flex;
       align-items: center;
@@ -155,7 +124,6 @@
       letter-spacing: 0.1em;
       text-transform: uppercase;
     }
-
     .cover-kicker::before {
       content: "";
       width: 8px;
@@ -163,7 +131,6 @@
       border-radius: 50%;
       background: linear-gradient(135deg, #f0c27b, #c7954d);
     }
-
     .cover-title {
       margin: 22px 0 14px;
       font-family: "Cormorant Garamond", serif;
@@ -171,7 +138,6 @@
       line-height: 0.9;
       letter-spacing: -0.03em;
     }
-
     .cover-message {
       margin: 0 auto;
       max-width: 24ch;
@@ -179,11 +145,7 @@
       font-weight: 700;
       line-height: 1.45;
     }
-
-    .cover-message strong {
-      color: #f2c98c;
-    }
-
+    .cover-message strong { color: #f2c98c; }
     .cover-sub {
       margin: 18px auto 0;
       max-width: 42ch;
@@ -191,7 +153,6 @@
       font-size: 14px;
       line-height: 1.75;
     }
-
     .page-section-head {
       display: flex;
       justify-content: space-between;
@@ -199,7 +160,6 @@
       gap: 12px;
       margin-bottom: 18px;
     }
-
     .page-title {
       color: var(--forest);
       font-size: 12px;
@@ -207,13 +167,7 @@
       letter-spacing: 0.12em;
       text-transform: uppercase;
     }
-
-    .page-copy {
-      color: var(--ink-soft);
-      font-size: 13px;
-      line-height: 1.6;
-    }
-
+    .page-copy { color: var(--ink-soft); font-size: 13px; line-height: 1.6; }
     .date-chip {
       padding: 11px 14px;
       border-radius: 18px;
@@ -222,7 +176,6 @@
       font-size: 12px;
       font-weight: 700;
     }
-
     .mini-summary,
     .slug-box,
     .focus-box,
@@ -232,7 +185,6 @@
       background: rgba(255,255,255,0.74);
       border: 1px solid rgba(23,49,39,0.08);
     }
-
     .mini-summary {
       display: flex;
       justify-content: space-between;
@@ -241,7 +193,6 @@
       margin-bottom: 18px;
       background: rgba(34,74,58,0.06);
     }
-
     .mini-summary strong,
     .slug-box strong,
     .focus-box strong {
@@ -253,14 +204,12 @@
       letter-spacing: 0.12em;
       text-transform: uppercase;
     }
-
     .mini-name {
       color: var(--ink);
       font-family: "Cormorant Garamond", serif;
       font-size: 32px;
       line-height: 0.95;
     }
-
     .mini-text,
     .slug-box div,
     .focus-box p,
@@ -273,41 +222,26 @@
       white-space: pre-wrap;
       word-break: keep-all;
     }
-
     .detail-top,
     .grid {
       display: grid;
       gap: 18px;
     }
-
-    .grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-
+    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .card {
       display: grid;
       gap: 14px;
       align-content: start;
       min-height: 176px;
     }
-
-    .card.span-2 {
-      grid-column: span 2;
-    }
-
+    .card.span-2 { grid-column: span 2; }
     .index {
       color: rgba(185,135,69,0.92);
       font-family: "Cormorant Garamond", serif;
       font-size: 34px;
       line-height: 1;
     }
-
-    .card h3 {
-      margin: 0;
-      font-size: 20px;
-      font-weight: 800;
-    }
-
+    .card h3 { margin: 0; font-size: 20px; font-weight: 800; }
     .list {
       margin: 0;
       padding: 0;
@@ -315,7 +249,7 @@
       display: grid;
       gap: 12px;
     }
-
+    .placeholder { color: rgba(89,112,99,0.62); font-style: italic; }
     .foot {
       margin-top: 20px;
       padding-top: 18px;
@@ -328,7 +262,6 @@
       font-size: 12px;
       line-height: 1.6;
     }
-
     .brand {
       color: var(--forest);
       font-size: 12px;
@@ -336,7 +269,6 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
-
     @media (max-width: 900px) {
       .viewer-nav,
       .page-section-head,
@@ -345,22 +277,10 @@
         flex-direction: column;
         align-items: start;
       }
-
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      .card.span-2 {
-        grid-column: span 1;
-      }
-
-      .viewer-buttons {
-        width: 100%;
-      }
-
-      .viewer-buttons button {
-        flex: 1;
-      }
+      .grid { grid-template-columns: 1fr; }
+      .card.span-2 { grid-column: span 1; }
+      .viewer-buttons { width: 100%; }
+      .viewer-buttons button { flex: 1; }
     }
   </style>
 </head>
@@ -376,7 +296,6 @@
         <button id="btn-next-page" type="button">피드백 보기</button>
       </div>
     </div>
-
     <article class="sheet">
       <section class="page is-active" data-page="1">
         <section class="cover-page">
@@ -391,7 +310,6 @@
           </div>
         </section>
       </section>
-
       <section class="page" data-page="2">
         <div class="page-section-head">
           <div>
@@ -400,7 +318,6 @@
           </div>
           <div class="date-chip">2026년 3월 17일</div>
         </div>
-
         <div class="mini-summary">
           <div>
             <strong>Student</strong>
@@ -408,7 +325,6 @@
           </div>
           <div class="mini-text">첫 페이지에서 안내를 확인한 뒤, 이 페이지에서 실제 수업 피드백 내용을 이어서 봅니다.</div>
         </div>
-
         <div class="detail-top">
           <div class="slug-box">
             <strong>URL Name</strong>
@@ -419,47 +335,38 @@
             <p>아이아이</p>
           </div>
         </div>
-
         <section class="grid">
           <section class="card">
             <div class="index">01</div>
             <h3>세부 활동</h3>
-            <ul class="list">
-              <li>ㅁㄴㅇㅁㄴㅇ</li>
-            </ul>
+            <ul class="list"><li>ㅁㄴㅇㅁㄴㅇ</li></ul>
           </section>
-
           <section class="card">
             <div class="index">02</div>
             <h3>아이의 반응 및 태도</h3>
             <p class="body-text">ㅁㄴㅇ</p>
           </section>
-
           <section class="card">
             <div class="index">03</div>
             <h3>이해도 및 진행 상황</h3>
             <p class="body-text">ㅁㄴㅇㅁㄴㅇ</p>
           </section>
-
           <section class="card">
             <div class="index">04</div>
             <h3>숙제</h3>
             <p class="body-text">ㅁㄴㅇ</p>
           </section>
-
           <section class="card span-2">
             <div class="index">05</div>
             <h3>다음 수업 계획</h3>
             <p class="body-text">ㅁㄴㅇ</p>
           </section>
-
           <section class="card span-2">
             <div class="index">06</div>
             <h3>추가 전달사항</h3>
             <p class="body-text">ㅁㄴㅇㅁ</p>
           </section>
         </section>
-
         <footer class="foot">
           <div class="brand">Class Feedback Letter</div>
           <div>코딩쏙 학원 수업 피드백 안내 페이지입니다.</div>
@@ -467,7 +374,6 @@
       </section>
     </article>
   </div>
-
   <script>
     const pages = Array.from(document.querySelectorAll(".page"));
     const pagePill = document.getElementById("page-pill");
@@ -475,7 +381,6 @@
     const prevButton = document.getElementById("btn-prev-page");
     const nextButton = document.getElementById("btn-next-page");
     let currentPage = 1;
-
     function updatePage(page) {
       currentPage = Math.max(1, Math.min(2, page));
       pages.forEach((section) => {
@@ -491,7 +396,6 @@
       nextButton.textContent = currentPage === 1 ? "피드백 보기" : "마지막 페이지";
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
-
     prevButton.addEventListener("click", () => updatePage(currentPage - 1));
     nextButton.addEventListener("click", () => updatePage(currentPage + 1));
     updatePage(1);
