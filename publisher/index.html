@@ -928,12 +928,12 @@
       // Extract sections based on common keywords
       const extract = (keywords) => {
         for (const kw of keywords) {
-          const regex = new RegExp(`(?:\\*\\*|\\*|- )?${kw}[\\s\\S]*?(?=(?:\\n(?:\\*\\*|\\*|- )?(?:세부 ?활동|오늘 ?배운 ?내용|반응 ?[및과]? ?태도|이해도 ?[및과]? ?(?:진행 ?)?상황|숙제|다음 ?수업 ?계획|추가 ?전달사항)|$))`, 'i');
+          const regex = new RegExp(`(?:\*\*|\\*|- )?${kw}[\\s\\S]*?(?=(?:\\n(?:\\*\\*|\\*|- )?(?:세부 ?활동|오늘 ?배운 ?내용|반응 ?[및과]? ?태도|이해도 ?[및과]? ?(?:진행 ?)?상황|숙제|다음 ?수업 ?계획|추가 ?전달사항)|$))`, 'i');
           const match = text.match(regex);
           if (match) {
             // Clean up: remove the keyword line itself, backticks, bold marks
             let content = match[0].replace(new RegExp(`^(?:\\*\\*|\\*|- )?${kw}.*\\n`, 'i'), '').trim();
-            content = content.replace(/\\*\\*/g, '').trim();
+            content = content.replace(/\*\*/g, '').trim();
             if (content.startsWith(':')) content = content.substring(1).trim();
             return content;
           }

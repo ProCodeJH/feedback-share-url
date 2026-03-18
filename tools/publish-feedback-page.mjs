@@ -123,7 +123,7 @@ function pushWithFallback(workspaceRoot) {
 }
 
 export function getPublishedUrl(slug) {
-  return siteBaseUrl + encodeURIComponent(slug) + "/";
+  return siteBaseUrl + slug + "/";
 }
 
 export async function publishFeedbackPage(rawData = {}, options = {}) {
@@ -136,6 +136,7 @@ export async function publishFeedbackPage(rawData = {}, options = {}) {
   const detailPhotoAsset = extractImageFromDataUrl(rawData.detailPhotoDataUrl);
   let detailPhotoSrc = "";
 
+  ensureGitRepo(workspaceRoot);
   await mkdir(pageDir, { recursive: true });
 
   if (detailPhotoAsset) {
@@ -149,7 +150,6 @@ export async function publishFeedbackPage(rawData = {}, options = {}) {
   }
 
   await writeFile(pageFile, renderFeedbackPageHtml(data, { detailPhotoSrc }), "utf8");
-  ensureGitRepo(workspaceRoot);
 
   if (!hasPendingChanges(relativeFilesToCommit, workspaceRoot)) {
     return {
