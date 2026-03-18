@@ -64,8 +64,30 @@ function normalizeCandidate(candidate) {
   return resolved;
 }
 
+function expandWorkspaceCandidates(candidates) {
+  const expanded = [];
+  const seen = new Set();
+
+  for (const candidate of candidates.filter(Boolean)) {
+    const resolved = normalizeCandidate(candidate);
+    const variants = [
+      resolved,
+      path.join(resolved, "feedback-share-url"),
+      path.join(path.dirname(resolved), "feedback-share-url")
+    ];
+
+    for (const variant of variants) {
+      if (seen.has(variant)) continue;
+      seen.add(variant);
+      expanded.push(variant);
+    }
+  }
+
+  return expanded;
+}
+
 function findWorkspaceRoot() {
-  const candidates = [
+  const candidates = expandWorkspaceCandidates([
     process.env.FEEDBACK_WORKSPACE_ROOT,
     process.env.PORTABLE_EXECUTABLE_DIR,
     process.env.PORTABLE_EXECUTABLE_FILE,
@@ -74,7 +96,7 @@ function findWorkspaceRoot() {
     process.execPath,
     path.dirname(process.execPath),
     __dirname
-  ].filter(Boolean);
+  ]);
 
   for (const candidate of candidates) {
     let current = normalizeCandidate(candidate);

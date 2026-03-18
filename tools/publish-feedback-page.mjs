@@ -21,6 +21,28 @@ function normalizeDirectoryPath(value) {
   return resolved;
 }
 
+function expandWorkspaceCandidates(candidates) {
+  const expanded = [];
+  const seen = new Set();
+
+  for (const candidate of candidates.filter(Boolean)) {
+    const resolved = normalizeDirectoryPath(candidate);
+    const variants = [
+      resolved,
+      path.join(resolved, "feedback-share-url"),
+      path.join(path.dirname(resolved), "feedback-share-url")
+    ];
+
+    for (const variant of variants) {
+      if (seen.has(variant)) continue;
+      seen.add(variant);
+      expanded.push(variant);
+    }
+  }
+
+  return expanded;
+}
+
 function findGitWorkspaceRoot(startPath) {
   let current = normalizeDirectoryPath(startPath);
 
@@ -38,14 +60,14 @@ function findGitWorkspaceRoot(startPath) {
 }
 
 function resolveWorkspaceRoot(options = {}) {
-  const candidates = [
+  const candidates = expandWorkspaceCandidates([
     options.workspaceRoot,
     process.env.FEEDBACK_WORKSPACE_ROOT,
     process.env.PORTABLE_EXECUTABLE_DIR,
     process.env.PORTABLE_EXECUTABLE_FILE,
     process.cwd(),
     repoRoot
-  ].filter(Boolean);
+  ]);
 
   for (const candidate of candidates) {
     const workspaceRoot = findGitWorkspaceRoot(candidate);
