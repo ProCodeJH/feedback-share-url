@@ -3,744 +3,424 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>공유형 수업 피드백</title>
+  <title>코딩쏙 피드백 링크 안내</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --paper: #f4efe5;
-      --ink: #173127;
-      --ink-soft: #597063;
-      --forest: #224a3a;
-      --forest-deep: #142b21;
-      --gold: #b98745;
-      --line: rgba(23,49,39,0.1);
-      --shadow: 0 28px 90px rgba(20,43,33,0.16);
-      --radius-xl: 28px;
+      --bg-top: #eef4ff;
+      --bg-bottom: #fff8ef;
+      --surface: rgba(255, 255, 255, 0.82);
+      --surface-strong: rgba(255, 255, 255, 0.94);
+      --text: #111827;
+      --muted: #5f6b7a;
+      --line: rgba(17, 24, 39, 0.08);
+      --blue: #0f62fe;
+      --blue-soft: rgba(15, 98, 254, 0.1);
+      --orange: #f97316;
+      --shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+      --radius-xl: 32px;
       --radius-lg: 22px;
       --radius-md: 16px;
     }
 
     * { box-sizing: border-box; }
     html, body { margin: 0; min-height: 100%; }
-    body { font-family: "Noto Sans KR", sans-serif; color: var(--ink); background: linear-gradient(180deg, #e8dfd0 0%, var(--paper) 44%, #ece4d8 100%); }
-    .app { min-height: 100vh; display: grid; grid-template-columns: minmax(320px, 400px) 1fr; gap: 28px; padding: 28px; }
-    .composer, .sheet { background: rgba(255,255,255,0.76); border: 1px solid rgba(23,49,39,0.08); box-shadow: var(--shadow); }
-    .composer { position: sticky; top: 28px; align-self: start; max-height: calc(100vh - 56px); overflow: auto; padding: 26px 22px 22px; border-radius: var(--radius-xl); }
-    .preview-wrap { min-width: 0; overflow: auto; padding: 6px 0 30px; }
-    .eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 999px; background: rgba(34,74,58,0.08); color: var(--forest); font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
-    h1 { margin: 18px 0 8px; font-family: "Cormorant Garamond", serif; font-size: clamp(38px, 4vw, 48px); line-height: 0.92; letter-spacing: -0.03em; }
-    .composer > p, .hint, .preview-head .meta, .status span, .body-text, .foot { color: var(--ink-soft); }
-    .note, .status, .card, .summary, .slug-box, .focus-box { border-radius: 18px; border: 1px solid rgba(23,49,39,0.08); background: rgba(255,255,255,0.72); }
-    .note, .status { padding: 14px 16px; margin-top: 16px; }
-    .fields { display: grid; gap: 14px; margin-top: 20px; }
-    .fields.two, .action-row, .top, .grid { display: grid; gap: 14px; }
-    .fields.two, .action-row { grid-template-columns: 1fr 1fr; }
-    .top { grid-template-columns: 1.45fr 1fr; gap: 22px; margin-bottom: 22px; }
-    .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
-    .card.span-2 { grid-column: span 2; }
-    .field { display: grid; gap: 6px; }
-    label { color: var(--forest); font-size: 12px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
-    input, textarea { width: 100%; padding: 13px 14px; border: 1px solid rgba(23,49,39,0.12); border-radius: var(--radius-md); background: rgba(255,255,255,0.78); color: var(--ink); font: inherit; line-height: 1.55; outline: none; resize: vertical; }
-    textarea { min-height: 92px; }
-    .actions { display: grid; gap: 10px; margin-top: 20px; }
-    button { appearance: none; border: 0; border-radius: 999px; padding: 13px 16px; font: inherit; font-weight: 800; cursor: pointer; }
-    .btn-primary { background: linear-gradient(135deg, var(--forest-deep), var(--forest)); color: white; }
-    .btn-secondary { background: rgba(34,74,58,0.08); color: var(--forest); border: 1px solid rgba(34,74,58,0.1); }
-    .preview-head { display: flex; justify-content: space-between; align-items: end; gap: 16px; margin-bottom: 16px; padding-inline: 8px; }
-    .preview-head .label { color: var(--ink-soft); font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
-    .viewer-nav { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 0 auto 16px; max-width: 980px; padding-inline: 8px; }
-    .viewer-meta { display: flex; align-items: center; gap: 10px; color: var(--ink-soft); font-size: 12px; font-weight: 700; }
-    .page-pill { display: inline-flex; align-items: center; justify-content: center; min-width: 88px; padding: 8px 12px; border-radius: 999px; background: rgba(34,74,58,0.08); color: var(--forest); font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
-    .viewer-buttons { display: flex; gap: 8px; }
-    .viewer-buttons button { min-width: 120px; }
-    .sheet { max-width: 980px; margin: 0 auto; padding: 28px; border-radius: 34px; }
-    .hero { min-height: 240px; padding: 24px; border-radius: 30px; background: linear-gradient(135deg, rgba(20,43,33,0.98), rgba(34,74,58,0.94)); color: white; display: flex; flex-direction: column; justify-content: space-between; }
-    .hero .kicker { display: inline-flex; width: fit-content; padding: 8px 14px; border-radius: 999px; background: rgba(255,255,255,0.08); font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
-    .hero h2 { margin: 18px 0 10px; font-family: "Cormorant Garamond", serif; font-size: clamp(50px, 6vw, 72px); line-height: 0.86; letter-spacing: -0.03em; }
-    .hero small { display: block; margin-top: 12px; font-family: "Noto Sans KR", sans-serif; font-size: 15px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.74); }
-    .cover-page { min-height: 640px; display: flex; align-items: center; justify-content: center; padding: clamp(28px, 5vw, 56px); }
-    .cover-card { width: 100%; max-width: 760px; padding: clamp(28px, 5vw, 52px); border-radius: 32px; background: linear-gradient(145deg, rgba(20,43,33,0.98), rgba(34,74,58,0.94)); color: white; text-align: center; box-shadow: 0 26px 70px rgba(20,43,33,0.22); }
-    .cover-logo-wrap { display: flex; justify-content: center; margin-bottom: 24px; }
-    .cover-logo { width: min(240px, 52vw); max-width: 240px; height: auto; filter: drop-shadow(0 18px 30px rgba(0,0,0,0.18)); }
-    .cover-kicker { display: inline-flex; align-items: center; gap: 10px; padding: 8px 14px; border-radius: 999px; background: rgba(255,255,255,0.08); font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
-    .cover-kicker::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: linear-gradient(135deg, #f0c27b, #c7954d); }
-    .cover-title { margin: 22px 0 14px; font-family: "Cormorant Garamond", serif; font-size: clamp(46px, 6vw, 70px); line-height: 0.9; letter-spacing: -0.03em; }
-    .cover-message { margin: 0 auto; max-width: 24ch; font-size: clamp(22px, 3.1vw, 34px); font-weight: 700; line-height: 1.45; }
-    .cover-message strong { color: #f2c98c; }
-    .cover-sub { margin: 18px auto 0; max-width: 42ch; color: rgba(255,255,255,0.74); font-size: 14px; line-height: 1.75; }
-    .detail-top { display: grid; gap: 18px; margin-bottom: 18px; }
-    .summary { display: grid; gap: 16px; padding: 22px; border-radius: 30px; }
-    .summary-head, .foot { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
-    .title { color: var(--forest); font-size: 12px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
-    .student { margin-top: 8px; font-family: "Cormorant Garamond", serif; font-size: clamp(30px, 4vw, 42px); line-height: 0.94; }
-    .student span { display: block; margin-top: 10px; font-family: "Noto Sans KR", sans-serif; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-soft); }
-    .date-chip { padding: 11px 14px; border-radius: 18px; background: rgba(185,135,69,0.12); color: #6b4717; font-size: 12px; font-weight: 700; }
-    .slug-box, .focus-box, .card { padding: 20px; }
-    .slug-box strong, .focus-box strong { display: block; margin-bottom: 8px; color: var(--forest); font-size: 11px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
-    .focus-box p, .body-text { margin: 0; line-height: 1.8; white-space: pre-wrap; word-break: keep-all; }
-    .list { margin: 0; padding: 0; list-style: none; display: grid; gap: 12px; }
-    .list li { color: var(--ink-soft); line-height: 1.75; }
-    .index { color: rgba(185,135,69,0.92); font-family: "Cormorant Garamond", serif; font-size: 34px; line-height: 1; }
-    .card h3 { margin: 0; font-size: 20px; font-weight: 800; }
-    .brand { color: var(--forest); font-size: 12px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
-    .viewer-page { display: none; }
-    .viewer-page.is-active { display: block; }
-    .page-section-head { display: flex; justify-content: space-between; align-items: end; gap: 12px; margin-bottom: 18px; }
-    .page-title { color: var(--forest); font-size: 12px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
-    .page-copy { color: var(--ink-soft); font-size: 13px; line-height: 1.6; }
-    .mini-summary { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 18px; padding: 18px 20px; border-radius: 24px; background: rgba(34,74,58,0.06); border: 1px solid rgba(23,49,39,0.08); }
-    .mini-summary strong { display: block; margin-bottom: 6px; color: var(--forest); font-size: 12px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; }
-    .mini-summary .mini-name { color: var(--ink); font-family: "Cormorant Garamond", serif; font-size: 32px; line-height: 0.95; }
-    .mini-summary .mini-text { color: var(--ink-soft); font-size: 13px; line-height: 1.65; }
-    .placeholder { color: rgba(89,112,99,0.62); font-style: italic; }
-    .toast { position: fixed; right: 24px; bottom: 24px; max-width: min(90vw, 340px); padding: 14px 16px; border-radius: 18px; background: rgba(20,43,33,0.94); color: white; font-size: 13px; font-weight: 700; opacity: 0; transform: translateY(12px); pointer-events: none; transition: opacity 0.18s ease, transform 0.18s ease; }
-    .toast.show { opacity: 1; transform: translateY(0); }
-    body.view-mode .app { grid-template-columns: 1fr; padding-inline: clamp(14px, 3vw, 28px); }
-    body.view-mode .composer, body.view-mode .preview-head { display: none; }
-    body.view-mode .preview-wrap { padding-top: 20px; }
-    @media (max-width: 1160px) { .app { grid-template-columns: 1fr; } .composer { position: static; max-height: none; } }
-    @media (max-width: 900px) { .fields.two, .action-row, .top, .grid { grid-template-columns: 1fr; } .card.span-2 { grid-column: span 1; } .preview-head, .summary-head, .foot, .viewer-nav, .mini-summary, .page-section-head { flex-direction: column; align-items: start; } .viewer-buttons { width: 100%; } .viewer-buttons button { flex: 1; } }
+    body {
+      font-family: "Inter", "Noto Sans KR", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(15, 98, 254, 0.16), transparent 28%),
+        radial-gradient(circle at top right, rgba(249, 115, 22, 0.14), transparent 24%),
+        linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+    }
+
+    .shell {
+      min-height: 100vh;
+      padding: 28px;
+      display: grid;
+      place-items: center;
+    }
+
+    .panel {
+      width: min(100%, 1120px);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      overflow: hidden;
+    }
+
+    .hero {
+      position: relative;
+      padding: 34px 34px 28px;
+      border-bottom: 1px solid var(--line);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.7), rgba(255,255,255,0.45)),
+        linear-gradient(135deg, rgba(15, 98, 254, 0.08), rgba(249, 115, 22, 0.08));
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -40px -48px auto;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(15, 98, 254, 0.18), rgba(15, 98, 254, 0));
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 14px;
+      border-radius: 999px;
+      background: var(--surface-strong);
+      border: 1px solid rgba(15, 98, 254, 0.12);
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), #68a3ff);
+      box-shadow: 0 0 0 6px rgba(15, 98, 254, 0.08);
+    }
+
+    h1 {
+      margin: 22px 0 14px;
+      max-width: 12ch;
+      font-size: clamp(42px, 6vw, 76px);
+      line-height: 0.92;
+      letter-spacing: -0.05em;
+    }
+
+    .lead {
+      max-width: 58ch;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.8;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(280px, 360px);
+      gap: 20px;
+      padding: 24px;
+    }
+
+    .card {
+      background: var(--surface-strong);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+    }
+
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 20px;
+      line-height: 1.25;
+      letter-spacing: -0.03em;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.75;
+    }
+
+    .steps {
+      display: grid;
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 52px 1fr;
+      gap: 14px;
+      align-items: start;
+      padding: 16px;
+      border-radius: var(--radius-md);
+      background: linear-gradient(135deg, rgba(15, 98, 254, 0.06), rgba(15, 98, 254, 0.02));
+      border: 1px solid rgba(15, 98, 254, 0.08);
+    }
+
+    .step-number {
+      display: grid;
+      place-items: center;
+      width: 52px;
+      height: 52px;
+      border-radius: 18px;
+      background: #0f62fe;
+      color: white;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .step strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 15px;
+    }
+
+    .step span {
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(249, 115, 22, 0.1);
+      color: #b45309;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .status-chip::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--orange);
+    }
+
+    .path-box,
+    .example-box {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: var(--radius-md);
+      background: #f8fafc;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+
+    .path-label,
+    .example-label {
+      display: block;
+      margin-bottom: 8px;
+      color: #475569;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .path-value,
+    .example-value {
+      margin: 0;
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.7;
+      word-break: break-all;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 18px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #0f62fe, #2563eb);
+      color: white;
+      box-shadow: 0 14px 28px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: var(--text);
+      border-color: rgba(15, 23, 42, 0.08);
+    }
+
+    .footnote {
+      margin-top: 14px;
+      color: #64748b;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 900px) {
+      .shell { padding: 16px; }
+      .hero { padding: 24px 20px 22px; }
+      .content { grid-template-columns: 1fr; padding: 16px; }
+      .card { padding: 20px; }
+      .step { grid-template-columns: 1fr; }
+      .step-number { width: 46px; height: 46px; border-radius: 14px; }
+      h1 { max-width: none; }
+    }
   </style>
 </head>
 <body>
-  <div class="app">
-    <aside class="composer">
-      <div class="eyebrow">URL Feedback</div>
-      <h1>한 장으로 만들고<br>링크로 보냅니다.</h1>
-      <p>이미지 두 장을 따로 보내는 대신, 하나의 웹 피드백 페이지를 만들어 카카오톡 URL로 전달하는 방식입니다.</p>
-      <div class="note" id="hosting-note"><strong>중요:</strong> 상대방이 열 수 있으려면 이 페이지가 공개 URL에 배포돼 있어야 합니다. 로컬 `file://` 주소는 공유용으로 쓸 수 없습니다.</div>
+  <div class="shell">
+    <main class="panel">
+      <section class="hero">
+        <div class="eyebrow" id="eyebrow">Feedback Link</div>
+        <h1 id="headline">이 주소는 개별 피드백 링크 전용입니다.</h1>
+        <p class="lead" id="lead">
+          선생님이 전달한 전체 URL로 접속해야 학생별 피드백 페이지가 열립니다. 루트 주소만 열거나 링크 일부가 빠지면 상세 페이지 대신 안내 화면이 표시됩니다.
+        </p>
+      </section>
 
-      <div class="fields">
-        <div class="field">
-          <label for="f-base-url">공개 Base URL</label>
-          <input id="f-base-url" type="text" placeholder="예: https://feedback.example.com/">
-          <div class="hint">비워두면 현재 주소를 사용합니다. 로컬 파일이라면 공개 주소를 직접 넣어야 합니다.</div>
-        </div>
-        <div class="field">
-          <label for="f-slug">URL 이름</label>
-          <input id="f-slug" type="text" placeholder="예: 코딩쏙학원_김우현_피드백">
-          <div class="hint">기본값은 `코딩쏙학원_[이름]_피드백` 형식으로 자동 생성됩니다.</div>
-        </div>
-      </div>
+      <section class="content">
+        <article class="card">
+          <h2 id="content-title">정상 접속 방법</h2>
+          <p id="content-copy">카카오톡이나 문자로 받은 링크를 처음부터 끝까지 그대로 열어 주세요. 학생명 슬러그가 포함된 주소여야 실제 피드백 페이지가 나옵니다.</p>
 
-      <div class="fields two">
-        <div class="field">
-          <label for="f-name">학생 이름</label>
-          <input id="f-name" type="text" placeholder="예: 김우현">
-        </div>
-        <div class="field">
-          <label for="f-date">수업일</label>
-          <input id="f-date" type="date">
-        </div>
-      </div>
-
-      <div class="fields">
-        <div class="field">
-          <label for="f-learn">오늘 배운 내용</label>
-          <textarea id="f-learn"></textarea>
-        </div>
-        <div class="field">
-          <label for="f-activities">세부 활동</label>
-          <textarea id="f-activities"></textarea>
-          <div class="hint">줄바꿈 기준으로 불릿 리스트가 됩니다.</div>
-        </div>
-        <div class="field">
-          <label for="f-reaction">아이의 반응 및 태도</label>
-          <textarea id="f-reaction"></textarea>
-        </div>
-        <div class="field">
-          <label for="f-progress">이해도 및 진행 상황</label>
-          <textarea id="f-progress"></textarea>
-        </div>
-      </div>
-
-      <div class="fields two">
-        <div class="field">
-          <label for="f-homework">숙제</label>
-          <textarea id="f-homework"></textarea>
-        </div>
-        <div class="field">
-          <label for="f-next">다음 수업 계획</label>
-          <textarea id="f-next"></textarea>
-        </div>
-      </div>
-
-      <div class="fields">
-        <div class="field">
-          <label for="f-extra">추가 전달사항</label>
-          <textarea id="f-extra"></textarea>
-        </div>
-      </div>
-
-      <div class="actions">
-        <button id="btn-generate" class="btn-primary" type="button">공유 링크 만들기</button>
-        <div class="action-row">
-          <button id="btn-copy" class="btn-secondary" type="button">링크 복사</button>
-          <button id="btn-share" class="btn-secondary" type="button">카톡으로 공유</button>
-        </div>
-        <button id="btn-reset" class="btn-secondary" type="button">새 피드백 작성</button>
-      </div>
-
-      <div class="status">
-        <strong id="status-main">공유 링크를 만들 준비가 되었습니다.</strong>
-        <span id="status-sub">현재 입력 내용을 URL에 담아 한 장의 피드백 페이지로 엽니다.</span>
-      </div>
-    </aside>
-
-    <main class="preview-wrap">
-      <div class="preview-head">
-        <div class="label">Preview</div>
-        <div class="meta" id="preview-meta">모바일의 공유 버튼을 누르면 카카오톡이 공유 대상에 나타날 수 있습니다.</div>
-      </div>
-
-      <div class="viewer-nav">
-        <div class="viewer-meta">
-          <div class="page-pill" id="page-pill">PAGE 1 / 2</div>
-          <div id="page-caption">첫 페이지에서 수업 요약과 활동 내용을 봅니다.</div>
-        </div>
-        <div class="viewer-buttons">
-          <button id="btn-prev-page" class="btn-secondary" type="button">이전 페이지</button>
-          <button id="btn-next-page" class="btn-secondary" type="button">다음 페이지</button>
-        </div>
-      </div>
-
-      <article class="sheet">
-        <section class="viewer-page is-active" data-page="1">
-          <section class="cover-page">
-            <div class="cover-card">
-              <div class="cover-logo-wrap">
-                <img class="cover-logo" src="./logo.png" alt="코딩쏙 학원 로고">
+          <div class="steps">
+            <div class="step">
+              <div class="step-number">STEP 1</div>
+              <div>
+                <strong>전달받은 전체 링크를 확인</strong>
+                <span>`/코딩쏙학원_학생_피드백/` 같은 경로가 URL 끝에 포함되어 있어야 합니다.</span>
               </div>
-              <div class="cover-kicker">Class Feedback Notice</div>
-              <h2 class="cover-title">학부모님<br>안녕하세요.</h2>
-              <p class="cover-message" id="p-cover-message">코딩쏙 학원입니다. 학생의 오늘의 수업 피드백 안내드립니다.</p>
-              <p class="cover-sub" id="p-cover-sub">다음 페이지 버튼을 누르면 오늘 수업에서 배운 내용과 반응, 이후 학습 계획을 이어서 확인하실 수 있습니다.</p>
             </div>
-          </section>
-        </section>
-
-        <section class="viewer-page" data-page="2">
-          <div class="page-section-head">
-            <div>
-              <div class="page-title">Feedback Details</div>
-              <div class="page-copy">실제 수업 피드백 내용을 이 페이지에서 이어서 확인합니다.</div>
+            <div class="step">
+              <div class="step-number">STEP 2</div>
+              <div>
+                <strong>브라우저에서 그대로 열기</strong>
+                <span>링크 일부만 복사되거나, 루트 주소만 열리면 상세 피드백 대신 안내 페이지가 열릴 수 있습니다.</span>
+              </div>
             </div>
-            <div class="date-chip" id="p-date-compact">날짜 미입력</div>
-          </div>
-
-          <div class="mini-summary">
-            <div>
-              <strong>Student</strong>
-              <div class="mini-name" id="p-name-compact">학생 이름</div>
-            </div>
-            <div class="mini-text">첫 페이지에서 수업 요약을 확인한 뒤, 이 페이지에서 이후 학습 흐름과 전달사항을 이어서 봅니다.</div>
-          </div>
-
-          <div class="detail-top">
-            <div class="slug-box">
-              <strong>URL Name</strong>
-              <div id="p-slug">코딩쏙학원_학생_피드백</div>
-            </div>
-            <div class="focus-box">
-              <strong>Today Focus</strong>
-              <p id="p-learn">오늘 배운 내용이 이곳에 표시됩니다.</p>
+            <div class="step">
+              <div class="step-number">STEP 3</div>
+              <div>
+                <strong>잘못 열린 경우 새 링크 재요청</strong>
+                <span>주소 오타나 만료 여부가 의심되면 발송한 쪽에 같은 학생의 최신 링크를 다시 요청해 주세요.</span>
+              </div>
             </div>
           </div>
 
-          <section class="grid">
-            <section class="card">
-              <div class="index">01</div>
-              <h3>세부 활동</h3>
-              <ul class="list" id="p-activities"></ul>
-            </section>
-            <section class="card">
-              <div class="index">02</div>
-              <h3>아이의 반응 및 태도</h3>
-              <p class="body-text" id="p-reaction"></p>
-            </section>
-            <section class="card">
-              <div class="index">03</div>
-              <h3>이해도 및 진행 상황</h3>
-              <p class="body-text" id="p-progress"></p>
-            </section>
-            <section class="card">
-              <div class="index">04</div>
-              <h3>숙제</h3>
-              <p class="body-text" id="p-homework"></p>
-            </section>
-            <section class="card span-2">
-              <div class="index">05</div>
-              <h3>다음 수업 계획</h3>
-              <p class="body-text" id="p-next"></p>
-            </section>
-            <section class="card span-2">
-              <div class="index">06</div>
-              <h3>추가 전달사항</h3>
-              <p class="body-text" id="p-extra"></p>
-            </section>
-          </section>
-        </section>
+          <div class="path-box">
+            <span class="path-label">현재 접속 경로</span>
+            <p class="path-value" id="current-path">확인 중...</p>
+          </div>
+        </article>
 
-        <footer class="foot">
-          <div class="brand">Class Feedback Letter</div>
-          <div id="footer-note">한 장짜리 웹 피드백을 URL로 전달하는 방식입니다.</div>
-        </footer>
-      </article>
+        <aside class="card">
+          <div class="status-chip" id="status-chip">Root Page</div>
+          <h2 id="side-title">정상 링크 예시</h2>
+          <p id="side-copy">공유용 링크는 저장소 루트가 아니라 학생별 상세 경로로 끝납니다.</p>
+
+          <div class="example-box">
+            <span class="example-label">예시 형식</span>
+            <p class="example-value" id="example-value">https://procodejh.github.io/feedback-share-url/코딩쏙학원_학생_피드백/</p>
+          </div>
+
+          <div class="actions">
+            <a class="btn btn-primary" id="home-link" href="/">루트 안내 열기</a>
+            <button class="btn btn-secondary" id="copy-link" type="button">현재 주소 복사</button>
+          </div>
+
+          <p class="footnote" id="footnote">
+            이 화면은 발행용 관리자 화면이 아닙니다. 학생별 상세 링크를 전달받아 접속할 때 사용하는 공개 페이지 전용 안내입니다.
+          </p>
+        </aside>
+      </section>
     </main>
   </div>
 
-  <div id="toast" class="toast"></div>
-
   <script>
-    const queryMap = {
-      s: "slug",
-      n: "name",
-      d: "date",
-      l: "learn",
-      a: "activities",
-      r: "reaction",
-      p: "progress",
-      h: "homework",
-      x: "next",
-      e: "extra"
-    };
-
-    const fields = {
-      baseUrl: document.getElementById("f-base-url"),
-      slug: document.getElementById("f-slug"),
-      name: document.getElementById("f-name"),
-      date: document.getElementById("f-date"),
-      learn: document.getElementById("f-learn"),
-      activities: document.getElementById("f-activities"),
-      reaction: document.getElementById("f-reaction"),
-      progress: document.getElementById("f-progress"),
-      homework: document.getElementById("f-homework"),
-      next: document.getElementById("f-next"),
-      extra: document.getElementById("f-extra")
-    };
-
-    const storageKeys = {
-      draft: "feedback-share-draft-v2",
-      baseUrl: "feedback-share-base-url-v2"
-    };
-
-    const statusMain = document.getElementById("status-main");
-    const statusSub = document.getElementById("status-sub");
-    const previewMeta = document.getElementById("preview-meta");
-    const hostingNote = document.getElementById("hosting-note");
-    const toast = document.getElementById("toast");
-    const previewWrap = document.querySelector(".preview-wrap");
-    const viewerPages = Array.from(document.querySelectorAll(".viewer-page"));
-    const pagePill = document.getElementById("page-pill");
-    const pageCaption = document.getElementById("page-caption");
-    const prevPageButton = document.getElementById("btn-prev-page");
-    const nextPageButton = document.getElementById("btn-next-page");
-
-    let latestShareUrl = "";
-    let slugTouched = false;
-    let toastTimer = null;
-    let currentPage = 1;
-    const totalPages = 2;
-
-    function pad(number) {
-      return String(number).padStart(2, "0");
-    }
-
-    function setTodayIfEmpty() {
-      if (fields.date.value) return;
-      const now = new Date();
-      fields.date.value = now.getFullYear() + "-" + pad(now.getMonth() + 1) + "-" + pad(now.getDate());
-    }
-
-    function slugify(text) {
-      return (text || "")
-        .trim()
-        .replace(/\s+/g, "_")
-        .replace(/[\\/?#[\]@!$&'()*+,;:=]+/g, "_")
-        .replace(/_+/g, "_")
-        .replace(/^_+|_+$/g, "");
-    }
-
-    function stripIndexPath(pathname) {
-      return (pathname || "/").replace(/\/index\.html$/i, "/");
-    }
-
-    function getRouteRootPath(pathname) {
-      const normalized = stripIndexPath(pathname);
-      if (normalized === "/") return "/";
-      if (normalized.endsWith("/")) return normalized;
-      const lastSlash = normalized.lastIndexOf("/");
-      return lastSlash >= 0 ? normalized.slice(0, lastSlash + 1) : "/";
-    }
-
-    function extractPathSlug(pathname) {
-      const raw = pathname || "/";
-      if (raw.endsWith("/")) return "";
-      const normalized = stripIndexPath(raw);
-      if (normalized.endsWith("/")) return "";
-      const segments = normalized.split("/").filter(Boolean);
-      return segments.length ? decodeURIComponent(segments[segments.length - 1]) : "";
-    }
-
-    function getSmartSlug() {
-      const manual = slugify(fields.slug.value);
-      if (manual) return manual;
-      const name = slugify(fields.name.value || "학생");
-      return "코딩쏙학원_" + name + "_피드백";
-    }
-
-    function syncSlugFromName() {
-      if (slugTouched) return;
-      fields.slug.value = getSmartSlug();
-    }
-
-    function formatDate(value) {
-      if (!value) return "날짜 미입력";
-      const parts = value.split("-");
-      if (parts.length !== 3) return value;
-      return Number(parts[0]) + "년 " + Number(parts[1]) + "월 " + Number(parts[2]) + "일";
-    }
-
-    function placeholderText(value, fallback) {
-      return (value || "").trim() || fallback;
-    }
-
-    function setText(id, value, fallback) {
-      const element = document.getElementById(id);
-      const hasValue = Boolean((value || "").trim());
-      element.textContent = placeholderText(value, fallback);
-      element.classList.toggle("placeholder", !hasValue);
-    }
-
-    function renderActivities(text) {
-      const target = document.getElementById("p-activities");
-      target.innerHTML = "";
-      const lines = (text || "")
-        .split("\n")
-        .map((line) => line.trim())
-        .filter(Boolean);
-
-      if (!lines.length) {
-        const li = document.createElement("li");
-        li.textContent = "세부 활동을 입력하면 이곳에 줄별로 정리됩니다.";
-        li.classList.add("placeholder");
-        target.appendChild(li);
-        return;
+    function getBasePath(pathname) {
+      const marker = "/feedback-share-url/";
+      const markerIndex = pathname.indexOf(marker);
+      if (markerIndex >= 0) {
+        return pathname.slice(0, markerIndex + marker.length);
       }
-
-      lines.forEach((line) => {
-        const li = document.createElement("li");
-        li.textContent = line;
-        target.appendChild(li);
-      });
+      return "/";
     }
 
-    function setCurrentPage(page, options = {}) {
-      currentPage = Math.max(1, Math.min(totalPages, page));
-      viewerPages.forEach((section) => {
-        section.classList.toggle("is-active", Number(section.dataset.page) === currentPage);
-      });
+    const pathname = window.location.pathname || "/";
+    const basePath = getBasePath(pathname);
+    const normalizedBase = basePath.endsWith("/") ? basePath : basePath + "/";
+    const normalizedPath = pathname.endsWith("/") ? pathname : pathname + "/";
+    const isRoot = normalizedPath === normalizedBase;
+    const slugPath = decodeURIComponent(
+      pathname.startsWith(basePath) ? pathname.slice(basePath.length) : pathname.replace(/^\/+/, "")
+    ).replace(/^\/+|\/+$/g, "");
 
-      pagePill.textContent = "PAGE " + currentPage + " / " + totalPages;
-      pageCaption.textContent = currentPage === 1
-        ? "첫 페이지는 안내 표지이고, 다음 버튼을 누르면 실제 피드백이 열립니다."
-        : "둘째 페이지에서 실제 피드백 내용을 이어서 봅니다.";
-      prevPageButton.disabled = currentPage === 1;
-      nextPageButton.disabled = currentPage === totalPages;
-      prevPageButton.textContent = currentPage === 1 ? "이전 페이지" : "첫 페이지로";
-      nextPageButton.textContent = currentPage === 1 ? "피드백 보기" : "마지막 페이지";
+    const headline = document.getElementById("headline");
+    const lead = document.getElementById("lead");
+    const contentTitle = document.getElementById("content-title");
+    const contentCopy = document.getElementById("content-copy");
+    const sideTitle = document.getElementById("side-title");
+    const sideCopy = document.getElementById("side-copy");
+    const statusChip = document.getElementById("status-chip");
+    const eyebrow = document.getElementById("eyebrow");
+    const currentPath = document.getElementById("current-path");
+    const homeLink = document.getElementById("home-link");
+    const footnote = document.getElementById("footnote");
+    const copyLink = document.getElementById("copy-link");
 
-      if (options.resetScroll) {
-        previewWrap.scrollTo({ top: 0, behavior: "smooth" });
-      }
+    homeLink.href = normalizedBase;
+    currentPath.textContent = decodeURIComponent(pathname);
+
+    if (!isRoot) {
+      document.title = "코딩쏙 피드백 링크를 찾지 못했습니다";
+      eyebrow.textContent = "Invalid Link";
+      statusChip.textContent = "Missing Page";
+      headline.textContent = "이 링크로는 피드백 페이지를 찾지 못했습니다.";
+      lead.textContent = "주소 일부가 잘렸거나 예전 링크일 수 있습니다. 학생별 슬러그가 포함된 최신 URL인지 다시 확인해 주세요.";
+      contentTitle.textContent = "다시 확인할 것";
+      contentCopy.textContent = slugPath
+        ? "현재 경로는 학생별 상세 피드백으로 연결되지 않았습니다. 전달받은 URL 전체를 다시 열어 주세요."
+        : "현재 경로가 비어 있어 상세 피드백을 열 수 없습니다. 전달받은 URL 전체를 다시 열어 주세요.";
+      sideTitle.textContent = "잘못 열린 경로";
+      sideCopy.textContent = slugPath
+        ? `현재 요청된 경로는 \"${slugPath}\" 입니다. 이 경로가 실제 발행된 피드백인지 확인이 필요합니다.`
+        : "현재 주소에 학생별 슬러그가 없습니다.";
+      footnote.textContent = "계속 같은 화면이 나오면 발송한 쪽에 새 짧은 URL을 다시 요청하는 것이 가장 빠릅니다.";
     }
 
-    function getData() {
-      return {
-        slug: getSmartSlug(),
-        name: fields.name.value.trim(),
-        date: fields.date.value,
-        learn: fields.learn.value.trim(),
-        activities: fields.activities.value,
-        reaction: fields.reaction.value.trim(),
-        progress: fields.progress.value.trim(),
-        homework: fields.homework.value.trim(),
-        next: fields.next.value.trim(),
-        extra: fields.extra.value.trim()
-      };
-    }
-
-    function updatePreview() {
-      const data = getData();
-      const studentName = placeholderText(data.name, "학생");
-      const formattedDate = formatDate(data.date);
-      const coverMessage = document.getElementById("p-cover-message");
-      document.title = data.name ? data.name + " 학생 수업 피드백" : "공유형 수업 피드백";
-      coverMessage.replaceChildren(
-        document.createTextNode("코딩쏙 학원입니다."),
-        document.createElement("br"),
-        Object.assign(document.createElement("strong"), { textContent: studentName + " 학생" }),
-        document.createTextNode("의 오늘의 수업 피드백 안내드립니다.")
-      );
-      document.getElementById("p-cover-sub").textContent = formattedDate + " 수업 내용을 다음 페이지에서 확인하실 수 있습니다.";
-      document.getElementById("p-name-compact").textContent = placeholderText(data.name, "학생 이름");
-      document.getElementById("p-date-compact").textContent = formattedDate;
-      document.getElementById("p-slug").textContent = data.slug;
-      setText("p-learn", data.learn, "오늘 배운 내용이 이곳에 표시됩니다.");
-      setText("p-reaction", data.reaction, "수업 중 보인 태도와 반응을 적어주세요.");
-      setText("p-progress", data.progress, "이해도와 진행 상황을 적어주세요.");
-      setText("p-homework", data.homework, "숙제가 있으면 여기에 표시됩니다.");
-      setText("p-next", data.next, "다음 수업 계획을 적어주세요.");
-      setText("p-extra", data.extra, "추가 전달사항이 있으면 이곳에 표시됩니다.");
-      renderActivities(data.activities);
-    }
-
-    function saveDraft() {
-      localStorage.setItem(storageKeys.baseUrl, fields.baseUrl.value.trim());
-      localStorage.setItem(storageKeys.draft, JSON.stringify({
-        slug: fields.slug.value,
-        name: fields.name.value,
-        date: fields.date.value,
-        learn: fields.learn.value,
-        activities: fields.activities.value,
-        reaction: fields.reaction.value,
-        progress: fields.progress.value,
-        homework: fields.homework.value,
-        next: fields.next.value,
-        extra: fields.extra.value
-      }));
-    }
-
-    function loadDraft() {
-      const baseUrl = localStorage.getItem(storageKeys.baseUrl);
-      if (baseUrl) fields.baseUrl.value = baseUrl;
-
-      const draft = localStorage.getItem(storageKeys.draft);
-      if (!draft) return;
-
+    copyLink.addEventListener("click", async () => {
       try {
-        const parsed = JSON.parse(draft);
-        Object.keys(parsed).forEach((key) => {
-          if (fields[key] && typeof parsed[key] === "string") {
-            fields[key].value = parsed[key];
-          }
-        });
-      } catch (error) {
-        console.error(error);
+        await navigator.clipboard.writeText(window.location.href);
+        copyLink.textContent = "복사됨";
+        setTimeout(() => { copyLink.textContent = "현재 주소 복사"; }, 1500);
+      } catch {
+        copyLink.textContent = "복사 실패";
+        setTimeout(() => { copyLink.textContent = "현재 주소 복사"; }, 1500);
       }
-    }
-
-    function applySharedQuery(params) {
-      let hasData = false;
-      Object.entries(queryMap).forEach(([queryKey, fieldKey]) => {
-        const value = params.get(queryKey);
-        if (value !== null && fields[fieldKey]) {
-          fields[fieldKey].value = value;
-          hasData = true;
-        }
-      });
-      return hasData;
-    }
-
-    function getRouteRootUrl() {
-      const manualBase = fields.baseUrl.value.trim();
-      const baseSource = manualBase || window.location.href;
-      const next = new URL(baseSource, window.location.href);
-      next.pathname = getRouteRootPath(next.pathname);
-      next.search = "";
-      next.hash = "";
-      return next;
-    }
-
-    function buildShareUrl() {
-      const data = getData();
-      const url = getRouteRootUrl();
-      Object.entries(queryMap).forEach(([queryKey, fieldKey]) => {
-        const value = data[fieldKey];
-        if (!value || fieldKey === "slug") return;
-        url.searchParams.set(queryKey, value);
-      });
-      url.pathname = url.pathname + encodeURIComponent(data.slug);
-      latestShareUrl = url.toString();
-      return latestShareUrl;
-    }
-
-    function refreshStatus() {
-      const url = latestShareUrl || buildShareUrl();
-      const isLocalFile = window.location.protocol === "file:";
-      const hasPublicBase = Boolean(fields.baseUrl.value.trim()) || /^https?:$/.test(window.location.protocol);
-
-      statusMain.textContent = hasPublicBase ? "공유 링크 준비 완료" : "공개 URL이 아직 필요합니다";
-
-      if (url.length > 2600) {
-        statusSub.innerHTML = '<span class="warn">현재 링크 길이 ' + url.length + '자입니다. 내용이 길면 일부 메신저에서 링크 공유가 불안정할 수 있습니다.</span>';
-      } else {
-        statusSub.textContent = "현재 링크 길이 " + url.length + "자. 경로형 URL 이름은 `" + getSmartSlug() + "` 로 들어갑니다.";
-      }
-
-      previewMeta.textContent = latestShareUrl
-        ? "공유 링크로 들어오면 첫 페이지부터 보고, 버튼으로 다음 페이지를 이어서 볼 수 있습니다."
-        : "모바일의 공유 버튼을 누르면 카카오톡이 공유 대상에 나타날 수 있습니다.";
-
-      if (isLocalFile && !fields.baseUrl.value.trim()) {
-        hostingNote.innerHTML = "<strong>중요:</strong> 로컬 `file://` 주소는 상대방이 열 수 없습니다. 공개 Base URL을 넣은 뒤 링크를 생성해야 합니다.";
-      } else {
-        hostingNote.innerHTML = "<strong>운영 방식:</strong> 이 페이지를 공개 URL에 올리고, 그 주소를 Base URL로 입력하면 URL 공유형 피드백으로 바로 사용할 수 있습니다.";
-      }
-    }
-
-    async function copyLink() {
-      const url = buildShareUrl();
-      if (window.location.protocol === "file:" && !fields.baseUrl.value.trim()) {
-        showToast("공개 Base URL을 먼저 넣어야 상대방이 링크를 열 수 있습니다.");
-        return;
-      }
-
-      try {
-        await navigator.clipboard.writeText(url);
-        showToast("공유 링크를 복사했습니다.");
-      } catch (error) {
-        console.error(error);
-        showToast("클립보드 복사에 실패했습니다.");
-      }
-    }
-
-    async function shareLink() {
-      const url = buildShareUrl();
-      if (window.location.protocol === "file:" && !fields.baseUrl.value.trim()) {
-        showToast("로컬 파일 주소는 공유용으로 쓸 수 없습니다. 공개 Base URL을 넣어주세요.");
-        return;
-      }
-
-      const data = getData();
-      if (navigator.share) {
-        try {
-          await navigator.share({
-            title: data.slug,
-            text: "수업 피드백 링크입니다. 접속해서 바로 확인해 주세요.",
-            url
-          });
-          showToast("공유 창을 열었습니다.");
-          return;
-        } catch (error) {
-          if (error && error.name === "AbortError") return;
-          console.error(error);
-        }
-      }
-
-      await copyLink();
-    }
-
-    function resetForm() {
-      const baseUrl = fields.baseUrl.value.trim();
-      Object.entries(fields).forEach(([key, field]) => {
-        if (key !== "baseUrl") field.value = "";
-      });
-      fields.baseUrl.value = baseUrl;
-      slugTouched = false;
-      setTodayIfEmpty();
-      syncSlugFromName();
-      latestShareUrl = "";
-      saveDraft();
-      updatePreview();
-      refreshStatus();
-      setCurrentPage(1);
-      showToast("새 피드백 작성을 시작했습니다.");
-    }
-
-    function showToast(message) {
-      toast.textContent = message;
-      toast.classList.add("show");
-      if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
-    }
-
-    function handleFieldUpdate() {
-      latestShareUrl = "";
-      updatePreview();
-      saveDraft();
-      refreshStatus();
-    }
-
-    function bindInputs() {
-      fields.slug.addEventListener("input", () => {
-        slugTouched = Boolean(fields.slug.value.trim());
-        handleFieldUpdate();
-      });
-
-      fields.name.addEventListener("input", () => {
-        syncSlugFromName();
-        handleFieldUpdate();
-      });
-
-      Object.entries(fields).forEach(([key, field]) => {
-        if (key === "slug" || key === "name") return;
-        field.addEventListener("input", handleFieldUpdate);
-        field.addEventListener("change", handleFieldUpdate);
-      });
-
-      prevPageButton.addEventListener("click", () => setCurrentPage(currentPage - 1, { resetScroll: true }));
-      nextPageButton.addEventListener("click", () => setCurrentPage(currentPage + 1, { resetScroll: true }));
-    }
-
-    function applyMode(hasData, params) {
-      document.body.classList.toggle("view-mode", hasData && params.get("edit") !== "1");
-    }
-
-    function init() {
-      setTodayIfEmpty();
-
-      const params = new URLSearchParams(window.location.search);
-      const pathSlug = extractPathSlug(window.location.pathname);
-      const hasQueryData = applySharedQuery(params);
-
-      if (!hasQueryData && !pathSlug) {
-        loadDraft();
-      }
-
-      if (!fields.baseUrl.value.trim() && /^https?:$/.test(window.location.protocol)) {
-        fields.baseUrl.value = getRouteRootUrl().toString();
-      }
-
-      if (pathSlug) {
-        fields.slug.value = pathSlug;
-      }
-
-      if (fields.slug.value.trim()) slugTouched = true;
-      if (!fields.date.value) setTodayIfEmpty();
-      syncSlugFromName();
-      applyMode(hasQueryData || Boolean(pathSlug), params);
-      bindInputs();
-      setCurrentPage(1);
-
-      document.getElementById("btn-generate").addEventListener("click", async () => {
-        const url = buildShareUrl();
-        if (window.location.protocol !== "file:" || fields.baseUrl.value.trim()) {
-          try {
-            await navigator.clipboard.writeText(url);
-            showToast("공유 링크를 만들고 바로 복사했습니다.");
-          } catch (error) {
-            console.error(error);
-            showToast("공유 링크를 만들었습니다.");
-          }
-        } else {
-          showToast("링크 형식은 만들었지만, 실제 공유 전에는 공개 Base URL이 필요합니다.");
-        }
-        refreshStatus();
-      });
-
-      document.getElementById("btn-copy").addEventListener("click", copyLink);
-      document.getElementById("btn-share").addEventListener("click", shareLink);
-      document.getElementById("btn-reset").addEventListener("click", resetForm);
-
-      updatePreview();
-      buildShareUrl();
-      refreshStatus();
-    }
-
-    init();
+    });
   </script>
 </body>
 </html>
