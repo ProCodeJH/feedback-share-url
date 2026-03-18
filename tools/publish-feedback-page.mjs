@@ -1,39 +1,135 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
+import { existsSync, statSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { normalizeFeedbackData, renderFeedbackPageHtml } from "./render-feedback-page.mjs";
+import { extractImageFromDataUrl, normalizeFeedbackData, renderFeedbackPageHtml } from "./render-feedback-page.mjs";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const siteBaseUrl = (process.env.SITE_BASE_URL || "https://procodejh.github.io/feedback-share-url/").replace(/\/+$/, "") + "/";
 
-function run(command, args) {
+function normalizeDirectoryPath(value) {
+  const resolved = path.resolve(value);
+
+  if (existsSync(resolved)) {
+    const stats = statSync(resolved);
+    if (stats.isFile()) {
+      return path.dirname(resolved);
+    }
+  }
+
+  return resolved;
+}
+
+function findGitWorkspaceRoot(startPath) {
+  let current = normalizeDirectoryPath(startPath);
+
+  while (true) {
+    if (existsSync(path.join(current, ".git")) && existsSync(path.join(current, "publisher"))) {
+      return current;
+    }
+
+    const parent = path.dirname(current);
+    if (parent === current) break;
+    current = parent;
+  }
+
+  return "";
+}
+
+function resolveWorkspaceRoot(options = {}) {
+  const candidates = [
+    options.workspaceRoot,
+    process.env.FEEDBACK_WORKSPACE_ROOT,
+    process.env.PORTABLE_EXECUTABLE_DIR,
+    process.env.PORTABLE_EXECUTABLE_FILE,
+    process.cwd(),
+    repoRoot
+  ].filter(Boolean);
+
+  for (const candidate of candidates) {
+    const workspaceRoot = findGitWorkspaceRoot(candidate);
+    if (workspaceRoot) {
+      return workspaceRoot;
+    }
+  }
+
+  throw new Error("Git 저장소를 찾지 못했습니다. exe는 feedback-share-url 폴더 안이나 그 하위 dist 폴더에서 실행해 주세요.");
+}
+
+function run(command, args, workspaceRoot = repoRoot) {
   return execFileSync(command, args, {
-    cwd: repoRoot,
+    cwd: workspaceRoot,
     stdio: ["ignore", "pipe", "pipe"],
     encoding: "utf8"
   }).trim();
 }
 
-function hasPendingChange(relativeFilePath) {
-  const output = run("git", ["status", "--short", "--", relativeFilePath]);
+function ensureGitRepo(workspaceRoot) {
+  try {
+    return run("git", ["rev-parse", "--is-inside-work-tree"], workspaceRoot) === "true";
+  } catch {
+    throw new Error("Git 저장소를 찾지 못했습니다. exe는 feedback-share-url 폴더 안이나 그 하위 dist 폴더에서 실행해 주세요.");
+  }
+}
+
+function hasPendingChanges(relativeFilePaths, workspaceRoot) {
+  const output = run("git", ["status", "--short", "--", ...relativeFilePaths], workspaceRoot);
   return Boolean(output.trim());
+}
+
+function getCurrentBranch(workspaceRoot) {
+  return run("git", ["branch", "--show-current"], workspaceRoot);
+}
+
+function pushWithFallback(workspaceRoot) {
+  try {
+    run("git", ["push"], workspaceRoot);
+  } catch (error) {
+    const stderr = String(error?.stderr || error?.message || "");
+    if (!/has no upstream branch/i.test(stderr)) {
+      throw error;
+    }
+
+    const branch = getCurrentBranch(workspaceRoot);
+    if (!branch) {
+      throw error;
+    }
+
+    run("git", ["push", "-u", "origin", branch], workspaceRoot);
+  }
 }
 
 export function getPublishedUrl(slug) {
   return siteBaseUrl + encodeURIComponent(slug) + "/";
 }
 
-export async function publishFeedbackPage(rawData = {}) {
+export async function publishFeedbackPage(rawData = {}, options = {}) {
   const data = normalizeFeedbackData(rawData);
-  const pageDir = path.join(repoRoot, data.slug);
+  const workspaceRoot = resolveWorkspaceRoot(options);
+  const pageDir = path.join(workspaceRoot, data.slug);
   const pageFile = path.join(pageDir, "index.html");
   const relativePageFile = path.posix.join(data.slug, "index.html");
+  const relativeFilesToCommit = [relativePageFile];
+  const detailPhotoAsset = extractImageFromDataUrl(rawData.detailPhotoDataUrl);
+  let detailPhotoSrc = "";
 
   await mkdir(pageDir, { recursive: true });
-  await writeFile(pageFile, renderFeedbackPageHtml(data), "utf8");
 
-  if (!hasPendingChange(relativePageFile)) {
+  if (detailPhotoAsset) {
+    const detailPhotoFileName = `detail-photo.${detailPhotoAsset.extension}`;
+    const detailPhotoFile = path.join(pageDir, detailPhotoFileName);
+    const relativeDetailPhotoFile = path.posix.join(data.slug, detailPhotoFileName);
+
+    await writeFile(detailPhotoFile, detailPhotoAsset.buffer);
+    detailPhotoSrc = `./${detailPhotoFileName}`;
+    relativeFilesToCommit.push(relativeDetailPhotoFile);
+  }
+
+  await writeFile(pageFile, renderFeedbackPageHtml(data, { detailPhotoSrc }), "utf8");
+  ensureGitRepo(workspaceRoot);
+
+  if (!hasPendingChanges(relativeFilesToCommit, workspaceRoot)) {
     return {
       slug: data.slug,
       url: getPublishedUrl(data.slug),
@@ -42,9 +138,9 @@ export async function publishFeedbackPage(rawData = {}) {
     };
   }
 
-  run("git", ["add", relativePageFile]);
-  run("git", ["commit", "-m", `Publish feedback page: ${data.slug}`]);
-  run("git", ["push"]);
+  run("git", ["add", "--", ...relativeFilesToCommit], workspaceRoot);
+  run("git", ["commit", "-m", `Publish feedback page: ${data.slug}`], workspaceRoot);
+  pushWithFallback(workspaceRoot);
 
   return {
     slug: data.slug,

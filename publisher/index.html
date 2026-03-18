@@ -6,330 +6,437 @@
   <title>코딩쏙 피드백 발행 스튜디오</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #f5efe5;
-      --bg-deep: #e9ddca;
-      --ink: #173127;
-      --ink-soft: #60776b;
-      --forest: #204839;
-      --forest-deep: #11241d;
-      --gold: #bb8b4f;
-      --gold-soft: rgba(187, 139, 79, 0.14);
-      --line: rgba(23, 49, 39, 0.1);
-      --panel: rgba(255, 252, 247, 0.78);
-      --shadow: 0 28px 90px rgba(17, 36, 29, 0.16);
-      --radius-xl: 30px;
-      --radius-lg: 24px;
-      --radius-md: 16px;
+      --bg: #FAFAFA;
+      --surface: #FFFFFF;
+      --text-primary: #111111;
+      --text-secondary: #666666;
+      --text-muted: #999999;
+      --border: #E5E7EB;
+      --border-subtle: #F0F0F0;
+      --accent: #0066FF;
+      --accent-soft: rgba(0,102,255,0.06);
+      --accent-border: rgba(0,102,255,0.15);
+      --success: #10B981;
+      --danger: #EF4444;
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
     }
 
-    * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100%; }
 
     body {
-      font-family: "Noto Sans KR", sans-serif;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at top left, rgba(187, 139, 79, 0.22), transparent 30%),
-        radial-gradient(circle at top right, rgba(32, 72, 57, 0.18), transparent 32%),
-        linear-gradient(180deg, var(--bg-deep) 0%, var(--bg) 46%, #efe7db 100%);
+      font-family: 'Inter', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background:
-        linear-gradient(rgba(255,255,255,0.14) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.14) 1px, transparent 1px);
-      background-size: 26px 26px;
-      opacity: 0.18;
-      mix-blend-mode: soft-light;
-    }
-
+    /* ===== LAYOUT ===== */
     .app {
-      position: relative;
       min-height: 100vh;
-      padding: 22px;
+      padding: 24px;
       display: grid;
-      grid-template-columns: minmax(360px, 430px) 1fr;
-      gap: 20px;
+      grid-template-columns: 400px 1fr;
+      gap: 24px;
+      max-width: 1600px;
+      margin: 0 auto;
     }
 
+    /* ===== LEFT: COMPOSER ===== */
     .composer {
       position: sticky;
-      top: 22px;
+      top: 24px;
       align-self: start;
-      max-height: calc(100vh - 44px);
-      overflow: auto;
-      padding: 24px 22px 22px;
-      border-radius: var(--radius-xl);
-      background: rgba(255, 252, 247, 0.8);
-      border: 1px solid rgba(23, 49, 39, 0.08);
-      backdrop-filter: blur(16px);
-      box-shadow: var(--shadow);
+      max-height: calc(100vh - 48px);
+      overflow-y: auto;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
     }
 
-    .preview-stage {
-      min-width: 0;
-      display: grid;
-      gap: 16px;
-      align-content: start;
+    .composer::-webkit-scrollbar { width: 5px; }
+    .composer::-webkit-scrollbar-track { background: transparent; }
+    .composer::-webkit-scrollbar-thumb {
+      background: #D1D5DB;
+      border-radius: 99px;
+    }
+    .composer::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
+
+    .composer-inner { padding: 24px; }
+
+    /* ===== LOGO & HEADER ===== */
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 20px;
     }
 
-    .hero {
-      padding: 28px;
-      border-radius: var(--radius-xl);
-      background:
-        radial-gradient(circle at top, rgba(255,255,255,0.08), transparent 28%),
-        linear-gradient(145deg, rgba(17, 36, 29, 0.98), rgba(32, 72, 57, 0.94));
-      color: white;
-      box-shadow: 0 32px 90px rgba(17, 36, 29, 0.22);
+    .logo-img {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      border-radius: 10px;
     }
 
-    .eyebrow {
-      display: inline-flex;
+    .logo-text h1 {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.3;
+    }
+
+    .logo-text p {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* ===== FORM ===== */
+    .section-divider {
+      display: flex;
       align-items: center;
       gap: 10px;
-      padding: 8px 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.08);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
+      margin: 24px 0 14px;
     }
 
-    .eyebrow::before {
-      content: "";
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #f2c98c, #c9964d);
-      box-shadow: 0 0 0 6px rgba(242, 201, 140, 0.14);
-    }
-
-    .hero h1 {
-      margin: 18px 0 10px;
-      font-family: "Cormorant Garamond", serif;
-      font-size: clamp(44px, 5vw, 68px);
-      line-height: 0.88;
-      letter-spacing: -0.04em;
-    }
-
-    .hero p {
-      margin: 0;
-      max-width: 56ch;
-      color: rgba(255,255,255,0.76);
-      line-height: 1.78;
-    }
-
-    .meta-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
-      margin-top: 18px;
-    }
-
-    .meta-card {
-      padding: 16px;
-      border-radius: 18px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.08);
-    }
-
-    .meta-card strong {
-      display: block;
-      margin-bottom: 8px;
-      color: rgba(255,255,255,0.68);
+    .section-divider span {
       font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.12em;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
       text-transform: uppercase;
+      white-space: nowrap;
     }
 
-    .meta-card span {
-      display: block;
-      font-size: 14px;
-      line-height: 1.65;
+    .section-divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: var(--border-subtle);
     }
 
-    h2 {
-      margin: 0 0 14px;
-      color: var(--forest);
-      font-size: 18px;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-    }
-
-    .form-block,
-    .side-panel,
-    .preview-card {
-      padding: 22px;
-      border-radius: var(--radius-lg);
-      background: var(--panel);
-      border: 1px solid var(--line);
-      box-shadow: 0 18px 60px rgba(17, 36, 29, 0.08);
-    }
-
-    .composer-stack {
-      display: grid;
-      gap: 16px;
-    }
-
-    .fields {
-      display: grid;
-      gap: 14px;
-    }
-
-    .fields.two {
-      grid-template-columns: 1fr 1fr;
-    }
-
-    .field {
-      display: grid;
-      gap: 6px;
-    }
+    .fields { display: grid; gap: 14px; }
+    .fields-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field { display: grid; gap: 5px; }
 
     label {
-      color: var(--forest);
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
     }
 
-    input,
-    textarea {
+    input, textarea {
       width: 100%;
-      padding: 13px 14px;
-      border: 1px solid rgba(23, 49, 39, 0.12);
-      border-radius: var(--radius-md);
-      background: rgba(255,255,255,0.9);
-      color: var(--ink);
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      color: var(--text-primary);
       font: inherit;
-      line-height: 1.55;
+      font-size: 14px;
+      line-height: 1.5;
       resize: vertical;
       outline: none;
-      transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
 
-    input:focus,
-    textarea:focus {
-      border-color: rgba(32, 72, 57, 0.42);
-      box-shadow: 0 0 0 4px rgba(32, 72, 57, 0.08);
-      transform: translateY(-1px);
+    input::placeholder, textarea::placeholder {
+      color: #C5C5C5;
     }
 
-    textarea { min-height: 96px; }
-
-    .hint,
-    .muted {
-      color: var(--ink-soft);
-      font-size: 12px;
-      line-height: 1.65;
+    input:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
     }
 
-    .slug-preview {
-      margin-top: 10px;
-      padding: 14px;
-      border-radius: 16px;
-      background: var(--gold-soft);
-      color: #6d4a1f;
+    textarea { min-height: 80px; }
+
+    input[type="file"] {
+      padding: 8px 10px;
+      cursor: pointer;
+    }
+
+    input[type="file"]::file-selector-button {
+      margin-right: 12px;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: #F9FAFB;
+      color: var(--text-primary);
+      font: inherit;
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+
+    input[type="file"]::file-selector-button:hover {
+      background: #FFFFFF;
+      border-color: #D1D5DB;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .photo-status {
+      display: grid;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .photo-status-text {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .photo-thumb {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      object-fit: cover;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background: #F9FAFB;
+      box-shadow: var(--shadow-xs);
+    }
+
+    .btn-inline {
+      justify-self: start;
+      padding: 8px 14px;
+      font-size: 13px;
+    }
+
+    .slug-chip {
+      margin-top: 8px;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-border);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 600;
       word-break: break-all;
+      font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
     }
 
-    .actions {
-      display: grid;
-      gap: 10px;
-      margin-top: 16px;
-    }
-
-    .button-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
+    /* ===== BUTTONS ===== */
+    .actions { display: grid; gap: 8px; margin-top: 24px; }
+    .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 
     button {
       appearance: none;
       border: 0;
-      border-radius: 999px;
-      padding: 13px 16px;
+      border-radius: var(--radius-sm);
+      padding: 10px 16px;
       font: inherit;
-      font-weight: 800;
+      font-size: 14px;
+      font-weight: 600;
       cursor: pointer;
-      transition: transform 0.18s ease, opacity 0.18s ease;
+      transition: all 0.15s ease;
     }
 
-    button:hover { transform: translateY(-1px); }
-    button:disabled { opacity: 0.58; cursor: not-allowed; transform: none; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
 
     .btn-primary {
-      background: linear-gradient(135deg, var(--forest-deep), var(--forest));
+      background: var(--accent);
       color: white;
-      box-shadow: 0 18px 36px rgba(17, 36, 29, 0.16);
+      box-shadow: var(--shadow-xs), 0 1px 0 rgba(0,0,0,0.05) inset, 0 -1px 0 rgba(0,0,0,0.15) inset;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #0052CC;
+      box-shadow: var(--shadow-sm);
     }
 
     .btn-secondary {
-      background: rgba(32, 72, 57, 0.08);
-      color: var(--forest);
-      border: 1px solid rgba(32, 72, 57, 0.1);
+      background: var(--surface);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-xs);
     }
 
-    .status {
-      margin-top: 14px;
-      padding: 14px;
-      border-radius: 16px;
-      background: rgba(255,255,255,0.86);
-      border: 1px solid var(--line);
-      color: var(--ink-soft);
+    .btn-secondary:hover:not(:disabled) {
+      background: #F9FAFB;
+      border-color: #D1D5DB;
+    }
+
+    .btn-danger {
+      background: var(--surface);
+      color: var(--danger);
+      border: 1px solid rgba(239,68,68,0.2);
+    }
+
+    .btn-danger:hover:not(:disabled) {
+      background: rgba(239,68,68,0.04);
+    }
+
+    /* ===== STATUS ===== */
+    .status-panel {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      background: #F9FAFB;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
       font-size: 13px;
-      line-height: 1.65;
-      white-space: pre-wrap;
+      line-height: 1.6;
     }
 
-    .result-url {
+    .result-link {
       display: block;
-      margin-top: 12px;
-      padding: 14px;
-      border-radius: 16px;
-      background: rgba(32, 72, 57, 0.06);
-      color: var(--forest-deep);
-      font-weight: 700;
+      margin-top: 8px;
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      background: rgba(16,185,129,0.04);
+      border: 1px solid rgba(16,185,129,0.15);
+      color: #059669;
+      font-weight: 600;
+      font-size: 13px;
       text-decoration: none;
       word-break: break-all;
+      transition: background 0.15s ease;
+    }
+
+    .result-link:hover { background: rgba(16,185,129,0.08); }
+
+    /* ===== RIGHT: PREVIEW ===== */
+    .preview-stage {
+      min-width: 0;
+      display: grid;
+      gap: 20px;
+      align-content: start;
+    }
+
+    /* ===== HERO BANNER ===== */
+    .hero {
+      padding: 32px;
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .hero-top {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .hero-logo {
+      width: 56px;
+      height: 56px;
+      object-fit: contain;
+      border-radius: 14px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .hero-brand {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .hero h2 {
+      font-size: clamp(26px, 3vw, 38px);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      color: var(--text-primary);
+    }
+
+    .hero p {
+      margin-top: 12px;
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.7;
+      max-width: 60ch;
+    }
+
+    .meta-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .meta-chip {
+      padding: 14px;
+      border-radius: var(--radius-md);
+      background: #F9FAFB;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .meta-chip strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .meta-chip span {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    /* ===== PREVIEW CARD ===== */
+    .preview-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-sm);
+      padding: 20px;
     }
 
     .preview-top {
       display: flex;
       justify-content: space-between;
-      align-items: end;
-      gap: 14px;
+      align-items: center;
+      margin-bottom: 16px;
     }
 
     .preview-top .title {
-      color: var(--forest);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .preview-top .muted {
       font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
+      color: var(--text-muted);
     }
 
     .preview-frame {
       position: relative;
       width: 100%;
-      min-height: 980px;
-      border: 1px solid rgba(23, 49, 39, 0.08);
-      border-radius: 26px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
       overflow: hidden;
-      background: linear-gradient(180deg, #f8f3ea, #f0e8dc);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.3);
+      background: #FAFAFA;
     }
 
     iframe {
@@ -339,162 +446,202 @@
       background: transparent;
     }
 
-    .preview-loading {
+    /* ===== SHIMMER ON UPDATE ===== */
+    @keyframes shimmer-sweep {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    @keyframes ring-pulse {
+      0% { box-shadow: 0 0 0 0 rgba(0,102,255,0.2); }
+      70% { box-shadow: 0 0 0 6px rgba(0,102,255,0); }
+      100% { box-shadow: 0 0 0 0 rgba(0,102,255,0); }
+    }
+
+    .shimmer-overlay {
       position: absolute;
       inset: 0;
-      display: grid;
-      place-items: center;
-      background: rgba(248, 243, 234, 0.72);
-      color: var(--ink-soft);
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      transition: opacity 0.18s ease;
       pointer-events: none;
-    }
-
-    .preview-loading.hidden {
+      overflow: hidden;
+      border-radius: inherit;
+      z-index: 2;
       opacity: 0;
+      transition: opacity 0.15s ease;
     }
 
-    @media (max-width: 1180px) {
+    .shimmer-overlay.active {
+      opacity: 1;
+    }
+
+    .shimmer-overlay::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      width: 40%;
+      background: linear-gradient(90deg, transparent, rgba(0,102,255,0.06), transparent);
+      animation: shimmer-sweep 0.7s ease-out;
+    }
+
+    .preview-frame.pulse {
+      animation: ring-pulse 0.5s ease;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1100px) {
       .app { grid-template-columns: 1fr; }
       .composer { position: static; max-height: none; }
     }
 
-    @media (max-width: 900px) {
-      .fields.two,
-      .button-row,
-      .meta-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .preview-top {
-        flex-direction: column;
-        align-items: start;
-      }
+    @media (max-width: 768px) {
+      .app { padding: 16px; gap: 16px; }
+      .fields-row, .action-row, .meta-row { grid-template-columns: 1fr; }
+      .preview-top { flex-direction: column; align-items: start; gap: 8px; }
     }
   </style>
 </head>
 <body>
   <div class="app">
     <aside class="composer">
-      <div class="composer-stack">
-        <section class="form-block">
-          <h2>피드백 작성</h2>
+      <div class="composer-inner">
+        <div class="logo-area">
+          <img class="logo-img" src="/logo.png" alt="코딩쏙">
+          <div class="logo-text">
+            <h1>피드백 스튜디오</h1>
+            <p>Feedback Publisher</p>
+          </div>
+        </div>
 
-          <div class="fields">
-            <div class="field">
-              <label for="slug">URL 이름</label>
-              <input id="slug" type="text" placeholder="예: 코딩쏙학원_김우현_피드백">
-              <div class="hint">비우면 학생 이름 기준으로 자동 생성됩니다.</div>
+        <div class="section-divider"><span>AI 자동 완성</span></div>
+        <div class="fields">
+          <div class="field">
+            <label for="ai-raw">AI 작성 피드백 붙여넣기</label>
+            <textarea id="ai-raw" style="min-height:100px; font-size:13px;" placeholder="ChatGPT나 Claude에서 작성해준 텍스트 전체를 여기에 붙여넣으시면, 자동으로 아래 칸들에 알맞게 들어갑니다."></textarea>
+          </div>
+          <button id="ai-parse-btn" class="btn-secondary" type="button" style="display:flex; justify-content:center; gap:8px; align-items:center;">
+            <span>내용 자동 분배하기</span>
+          </button>
+        </div>
+
+        <div class="section-divider" style="margin-top:32px;"><span>기본 정보</span></div>
+        <div class="fields">
+          <div class="field">
+            <label for="slug">URL 이름</label>
+            <input id="slug" type="text" placeholder="예: 코딩쏙학원_김우현_피드백">
+            <div class="hint">비우면 학생 이름 기준으로 자동 생성됩니다.</div>
+          </div>
+        </div>
+        <div class="slug-chip" id="slug-preview">코딩쏙학원_학생_피드백</div>
+
+        <div class="fields-row" style="margin-top: 14px;">
+          <div class="field">
+            <label for="name">학생 이름</label>
+            <input id="name" type="text" placeholder="김우현">
+          </div>
+          <div class="field">
+            <label for="date">수업일</label>
+            <input id="date" type="date">
+          </div>
+        </div>
+
+        <div class="section-divider"><span>수업 내용</span></div>
+        <div class="fields">
+          <div class="field">
+            <label for="detail-photo">상단 배경 사진</label>
+            <input id="detail-photo" type="file" accept="image/png,image/jpeg,image/webp,image/gif">
+            <div class="hint">학생 사진이나 안내 이미지를 올리면 상세 페이지 상단 카드 배경으로 적용됩니다. 가로형 사진과 8MB 이하 파일을 권장합니다.</div>
+            <div class="photo-status">
+              <div class="photo-status-text" id="detail-photo-text">아직 사진을 선택하지 않았습니다. 미선택 시 기본 배경이 유지됩니다.</div>
+              <img id="detail-photo-preview" class="photo-thumb" alt="상세 페이지 배경 미리보기" hidden>
+              <button id="detail-photo-clear" class="btn-secondary btn-inline" type="button" hidden>사진 제거</button>
             </div>
           </div>
-
-          <div class="slug-preview" id="slug-preview">코딩쏙학원_학생_피드백</div>
-
-          <div class="fields two" style="margin-top: 14px;">
-            <div class="field">
-              <label for="name">학생 이름</label>
-              <input id="name" type="text" placeholder="예: 김우현">
-            </div>
-            <div class="field">
-              <label for="date">수업일</label>
-              <input id="date" type="date">
-            </div>
+          <div class="field">
+            <label for="learn">오늘 배운 내용</label>
+            <textarea id="learn" placeholder="오늘 수업의 핵심 포인트를 입력하세요"></textarea>
           </div>
-
-          <div class="fields" style="margin-top: 14px;">
-            <div class="field">
-              <label for="learn">오늘 배운 내용</label>
-              <textarea id="learn" placeholder="오늘 수업의 핵심 포인트를 입력하세요"></textarea>
-            </div>
-            <div class="field">
-              <label for="activities">세부 활동</label>
-              <textarea id="activities" placeholder="한 줄에 하나씩 입력하세요"></textarea>
-            </div>
-            <div class="field">
-              <label for="reaction">아이의 반응 및 태도</label>
-              <textarea id="reaction"></textarea>
-            </div>
-            <div class="field">
-              <label for="progress">이해도 및 진행 상황</label>
-              <textarea id="progress"></textarea>
-            </div>
+          <div class="field">
+            <label for="activities">세부 활동</label>
+            <textarea id="activities" placeholder="한 줄에 하나씩 입력하세요"></textarea>
+            <div class="hint">줄바꿈 기준으로 불릿 리스트가 됩니다.</div>
           </div>
-
-          <div class="fields two" style="margin-top: 14px;">
-            <div class="field">
-              <label for="homework">숙제</label>
-              <textarea id="homework"></textarea>
-            </div>
-            <div class="field">
-              <label for="next">다음 수업 계획</label>
-              <textarea id="next"></textarea>
-            </div>
+          <div class="field">
+            <label for="reaction">아이의 반응 및 태도</label>
+            <textarea id="reaction" placeholder="수업 중 보인 반응과 태도"></textarea>
           </div>
-
-          <div class="fields" style="margin-top: 14px;">
-            <div class="field">
-              <label for="extra">추가 전달사항</label>
-              <textarea id="extra"></textarea>
-            </div>
+          <div class="field">
+            <label for="progress">이해도 및 진행 상황</label>
+            <textarea id="progress" placeholder="학습 이해도와 진행 상태"></textarea>
           </div>
-        </section>
+        </div>
 
-        <section class="side-panel">
-          <h2>짧은 URL 발행</h2>
-          <div class="muted">이 페이지에서 바로 미리보기를 확인한 뒤, 같은 디자인으로 정적 페이지를 발행합니다. 긴 쿼리 링크가 아니라 실제 짧은 경로 URL을 만듭니다.</div>
-
-          <div class="actions">
-            <button id="publish-btn" class="btn-primary" type="button">짧은 URL 발행</button>
-            <div class="button-row">
-              <button id="copy-btn" class="btn-secondary" type="button" disabled>링크 복사</button>
-              <button id="open-btn" class="btn-secondary" type="button" disabled>링크 열기</button>
-            </div>
+        <div class="section-divider"><span>숙제 &amp; 계획</span></div>
+        <div class="fields-row">
+          <div class="field">
+            <label for="homework">숙제</label>
+            <textarea id="homework" placeholder="숙제 내용"></textarea>
           </div>
+          <div class="field">
+            <label for="next">다음 수업 계획</label>
+            <textarea id="next" placeholder="다음 수업 계획"></textarea>
+          </div>
+        </div>
+        <div class="fields" style="margin-top: 12px;">
+          <div class="field">
+            <label for="extra">추가 전달사항</label>
+            <textarea id="extra" placeholder="학부모님께 전달할 추가 사항"></textarea>
+          </div>
+        </div>
 
-          <div class="status" id="status">아직 발행하지 않았습니다. 오른쪽 미리보기가 실제 발행 결과와 동일한 템플릿입니다.</div>
-          <a class="result-url" id="result-url" href="#" hidden target="_blank" rel="noreferrer"></a>
-        </section>
+        <div class="actions">
+          <button id="publish-btn" class="btn-primary" type="button">짧은 URL 발행</button>
+          <div class="action-row">
+            <button id="copy-btn" class="btn-secondary" type="button" disabled>링크 복사</button>
+            <button id="open-btn" class="btn-secondary" type="button" disabled>링크 열기</button>
+          </div>
+          <button id="reset-btn" class="btn-danger" type="button">새 피드백 작성</button>
+        </div>
+
+        <div class="status-panel" id="status">아직 발행하지 않았습니다. 우측 미리보기가 실제 발행 결과와 동일한 템플릿입니다.</div>
+        <a class="result-link" id="result-url" href="#" hidden target="_blank" rel="noreferrer"></a>
       </div>
     </aside>
 
     <main class="preview-stage">
       <section class="hero">
-        <div class="eyebrow">Feedback Studio</div>
-        <h1>작성, 미리보기,<br>짧은 링크 발행을 한 화면에서.</h1>
-        <p>실제 발행될 2페이지 피드백 페이지를 그대로 우측에서 라이브로 보여주고, 같은 데이터로 GitHub Pages에 정적 페이지를 발행합니다. 미리보기와 결과물이 달라지는 문제를 줄인 구조입니다.</p>
-
-        <div class="meta-grid">
-          <div class="meta-card">
-            <strong>Flow</strong>
-            <span>작성 → live preview → 짧은 URL 발행</span>
+        <div class="hero-top">
+          <img class="hero-logo" src="/logo.png" alt="코딩쏙">
+          <div>
+            <div class="hero-brand">Feedback Studio</div>
           </div>
-          <div class="meta-card">
+        </div>
+        <h2>작성, 미리보기,<br>짧은 링크 발행을<br>한 화면에서.</h2>
+        <p>실제 발행될 2페이지 피드백 페이지를 실시간으로 미리보고, 같은 데이터로 GitHub Pages에 정적 페이지를 발행합니다.</p>
+
+        <div class="meta-row">
+          <div class="meta-chip">
+            <strong>Flow</strong>
+            <span>작성 → 미리보기 → 발행</span>
+          </div>
+          <div class="meta-chip">
             <strong>URL</strong>
             <span id="hero-slug">코딩쏙학원_학생_피드백</span>
           </div>
-          <div class="meta-card">
+          <div class="meta-chip">
             <strong>Parity</strong>
-            <span>미리보기와 발행 HTML을 같은 렌더러로 맞춥니다</span>
+            <span>미리보기 = 발행 결과</span>
           </div>
         </div>
       </section>
 
       <section class="preview-card">
         <div class="preview-top">
-          <div>
-            <div class="title">Live Preview</div>
-            <div class="muted">아래 프리뷰는 실제 짧은 URL 페이지와 같은 HTML 렌더러로 생성됩니다.</div>
-          </div>
-          <div class="muted" id="preview-meta">입력값을 수정하면 잠시 후 자동으로 반영됩니다.</div>
+          <div class="title">Live Preview</div>
+          <div class="muted" id="preview-meta">입력값을 수정하면 자동 반영됩니다.</div>
         </div>
 
-        <div class="preview-frame">
+        <div class="preview-frame" id="preview-frame-wrap">
           <iframe id="preview-frame" title="피드백 미리보기"></iframe>
-          <div class="preview-loading" id="preview-loading">Rendering Preview</div>
+          <div class="shimmer-overlay" id="shimmer-overlay"></div>
         </div>
       </section>
     </main>
@@ -519,31 +666,39 @@
     const publishButton = document.getElementById("publish-btn");
     const copyButton = document.getElementById("copy-btn");
     const openButton = document.getElementById("open-btn");
+    const resetButton = document.getElementById("reset-btn");
     const status = document.getElementById("status");
     const resultUrl = document.getElementById("result-url");
     const previewFrame = document.getElementById("preview-frame");
-    const previewLoading = document.getElementById("preview-loading");
+    const previewFrameWrap = document.getElementById("preview-frame-wrap");
+    const shimmerOverlay = document.getElementById("shimmer-overlay");
     const previewMeta = document.getElementById("preview-meta");
+    const aiRaw = document.getElementById("ai-raw");
+    const aiParseBtn = document.getElementById("ai-parse-btn");
+    const detailPhotoInput = document.getElementById("detail-photo");
+    const detailPhotoText = document.getElementById("detail-photo-text");
+    const detailPhotoPreview = document.getElementById("detail-photo-preview");
+    const detailPhotoClearButton = document.getElementById("detail-photo-clear");
 
     let slugTouched = false;
     let lastUrl = "";
     let previewTimer = null;
     let previewController = null;
+    let detailPhotoDataUrl = "";
+    let detailPhotoFileName = "";
 
-    function pad(number) {
-      return String(number).padStart(2, "0");
-    }
+    function pad(n) { return String(n).padStart(2, "0"); }
 
     function setTodayIfEmpty() {
       if (fields.date.value) return;
-      const now = new Date();
-      fields.date.value = now.getFullYear() + "-" + pad(now.getMonth() + 1) + "-" + pad(now.getDate());
+      const d = new Date();
+      fields.date.value = d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
     }
 
     function slugify(text) {
       return String(text || "")
         .trim()
-        .replace(/\\s+/g, "_")
+        .replace(/\s+/g, "_")
         .replace(/[\\/?#[\]@!$&'()*+,;:=]+/g, "_")
         .replace(/_+/g, "_")
         .replace(/^_+|_+$/g, "");
@@ -552,8 +707,7 @@
     function smartSlug() {
       const manual = slugify(fields.slug.value);
       if (manual) return manual;
-      const name = slugify(fields.name.value || "학생");
-      return "코딩쏙학원_" + name + "_피드백";
+      return "코딩쏙학원_" + slugify(fields.name.value || "학생") + "_피드백";
     }
 
     function syncSlug() {
@@ -567,6 +721,84 @@
       heroSlug.textContent = slug;
     }
 
+    function updateDetailPhotoUI() {
+      const hasDetailPhoto = Boolean(detailPhotoDataUrl);
+      detailPhotoText.textContent = hasDetailPhoto
+        ? `${detailPhotoFileName || "선택한 사진"} 선택됨. 상세 페이지 첫 카드 배경으로 반영됩니다.`
+        : "아직 사진을 선택하지 않았습니다. 미선택 시 기본 배경이 유지됩니다.";
+
+      detailPhotoPreview.hidden = !hasDetailPhoto;
+      detailPhotoClearButton.hidden = !hasDetailPhoto;
+
+      if (hasDetailPhoto) {
+        detailPhotoPreview.src = detailPhotoDataUrl;
+        return;
+      }
+
+      detailPhotoPreview.removeAttribute("src");
+    }
+
+    function readFileAsDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ""));
+        reader.onerror = () => reject(new Error("이미지를 읽지 못했습니다."));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function handleDetailPhotoChange() {
+      const file = detailPhotoInput.files && detailPhotoInput.files[0];
+
+      if (!file) {
+        detailPhotoDataUrl = "";
+        detailPhotoFileName = "";
+        updateDetailPhotoUI();
+        schedulePreview();
+        return;
+      }
+
+      if (!file.type.startsWith("image/")) {
+        detailPhotoInput.value = "";
+        detailPhotoDataUrl = "";
+        detailPhotoFileName = "";
+        updateDetailPhotoUI();
+        status.textContent = "이미지 파일만 선택할 수 있습니다.";
+        return;
+      }
+
+      if (file.size > 8 * 1024 * 1024) {
+        detailPhotoInput.value = "";
+        detailPhotoDataUrl = "";
+        detailPhotoFileName = "";
+        updateDetailPhotoUI();
+        status.textContent = "8MB 이하 이미지로 업로드해 주세요.";
+        return;
+      }
+
+      try {
+        detailPhotoDataUrl = await readFileAsDataUrl(file);
+        detailPhotoFileName = file.name;
+        updateDetailPhotoUI();
+        status.textContent = "사진을 불러왔습니다. 우측 상세 페이지 카드 미리보기에서 바로 확인할 수 있습니다.";
+        schedulePreview();
+      } catch (error) {
+        detailPhotoInput.value = "";
+        detailPhotoDataUrl = "";
+        detailPhotoFileName = "";
+        updateDetailPhotoUI();
+        status.textContent = error.message;
+      }
+    }
+
+    function clearDetailPhoto() {
+      detailPhotoInput.value = "";
+      detailPhotoDataUrl = "";
+      detailPhotoFileName = "";
+      updateDetailPhotoUI();
+      schedulePreview();
+    }
+
     function getPayload() {
       return {
         slug: smartSlug(),
@@ -578,18 +810,27 @@
         progress: fields.progress.value.trim(),
         homework: fields.homework.value.trim(),
         next: fields.next.value.trim(),
-        extra: fields.extra.value.trim()
+        extra: fields.extra.value.trim(),
+        detailPhotoDataUrl
       };
     }
 
-    async function renderPreview() {
-      if (previewController) {
-        previewController.abort();
-      }
+    function flashShimmer() {
+      shimmerOverlay.classList.remove("active");
+      previewFrameWrap.classList.remove("pulse");
+      void shimmerOverlay.offsetWidth;
+      shimmerOverlay.classList.add("active");
+      previewFrameWrap.classList.add("pulse");
+      setTimeout(() => {
+        shimmerOverlay.classList.remove("active");
+        previewFrameWrap.classList.remove("pulse");
+      }, 700);
+    }
 
+    async function renderPreview() {
+      if (previewController) previewController.abort();
       previewController = new AbortController();
-      previewLoading.classList.remove("hidden");
-      previewMeta.textContent = "실제 발행 결과와 같은 템플릿으로 렌더링 중입니다.";
+      previewMeta.textContent = "렌더링 중...";
 
       try {
         const response = await fetch("/api/preview", {
@@ -600,37 +841,27 @@
         });
 
         const html = await response.text();
-        if (!response.ok) {
-          throw new Error(html || "미리보기를 불러오지 못했습니다.");
-        }
+        if (!response.ok) throw new Error(html || "미리보기 실패");
 
         previewFrame.srcdoc = html;
-        previewMeta.textContent = "미리보기와 발행 페이지는 같은 렌더러를 사용합니다.";
+        previewMeta.textContent = "미리보기와 발행 페이지는 같은 렌더러입니다.";
+        flashShimmer();
       } catch (error) {
         if (error.name === "AbortError") return;
-        previewFrame.srcdoc = "<!DOCTYPE html><html lang='ko'><body style='font-family:sans-serif;padding:24px'>미리보기를 렌더링하지 못했습니다.</body></html>";
-        previewMeta.textContent = "미리보기 렌더링 중 오류가 발생했습니다.";
-      } finally {
-        previewLoading.classList.add("hidden");
+        previewFrame.srcdoc = "<!DOCTYPE html><html lang='ko'><body style='font-family:sans-serif;padding:24px;color:#999'>미리보기 렌더링 오류</body></html>";
+        previewMeta.textContent = "오류 발생";
       }
     }
 
     function schedulePreview() {
       updateSlugUI();
-      previewLoading.classList.remove("hidden");
-
-      if (previewTimer) {
-        clearTimeout(previewTimer);
-      }
-
-      previewTimer = setTimeout(() => {
-        renderPreview();
-      }, 180);
+      if (previewTimer) clearTimeout(previewTimer);
+      previewTimer = setTimeout(renderPreview, 200);
     }
 
     async function publish() {
       publishButton.disabled = true;
-      status.textContent = "발행 중입니다. 정적 페이지 생성, git commit, git push를 차례대로 진행합니다.";
+      status.textContent = "발행 중... 정적 페이지 생성 → git commit → push";
 
       try {
         const response = await fetch("/api/publish", {
@@ -640,9 +871,7 @@
         });
 
         const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.error || "발행에 실패했습니다.");
-        }
+        if (!response.ok) throw new Error(data.error || "발행 실패");
 
         lastUrl = data.url;
         resultUrl.hidden = false;
@@ -651,10 +880,10 @@
         copyButton.disabled = false;
         openButton.disabled = false;
         status.textContent = data.committed
-          ? "발행 완료되었습니다. GitHub Pages 반영 후 바로 링크를 열 수 있습니다."
-          : "기존 내용과 동일하여 새 커밋 없이 URL만 반환했습니다.";
+          ? "✓ 발행 완료. GitHub Pages 반영 후 링크에서 바로 열 수 있습니다."
+          : "기존 내용과 동일해서 새 커밋 없이 URL만 반환했습니다.";
       } catch (error) {
-        status.textContent = error.message;
+        status.textContent = "오류: " + error.message;
       } finally {
         publishButton.disabled = false;
       }
@@ -664,10 +893,8 @@
       if (!lastUrl) return;
       try {
         await navigator.clipboard.writeText(lastUrl);
-        status.textContent = "발행된 링크를 복사했습니다.";
-      } catch (error) {
-        status.textContent = "클립보드 복사에 실패했습니다.";
-      }
+        status.textContent = "링크를 복사했습니다.";
+      } catch { status.textContent = "클립보드 복사 실패"; }
     }
 
     function openLink() {
@@ -675,9 +902,81 @@
       window.open(lastUrl, "_blank", "noopener");
     }
 
+    function resetForm() {
+      Object.values(fields).forEach(f => { f.value = ""; });
+      aiRaw.value = "";
+      slugTouched = false;
+      lastUrl = "";
+      detailPhotoInput.value = "";
+      detailPhotoDataUrl = "";
+      detailPhotoFileName = "";
+      updateDetailPhotoUI();
+      resultUrl.hidden = true;
+      copyButton.disabled = true;
+      openButton.disabled = true;
+      setTodayIfEmpty();
+      syncSlug();
+      updateSlugUI();
+      schedulePreview();
+      status.textContent = "새 피드백 작성을 시작합니다.";
+    }
+
+    function parseAIText() {
+      const text = aiRaw.value;
+      if (!text.trim()) return;
+
+      // Extract sections based on common keywords
+      const extract = (keywords) => {
+        for (const kw of keywords) {
+          const regex = new RegExp(`(?:\\*\\*|\\*|- )?${kw}[\\s\\S]*?(?=(?:\\n(?:\\*\\*|\\*|- )?(?:세부 ?활동|오늘 ?배운 ?내용|반응 ?[및과]? ?태도|이해도 ?[및과]? ?(?:진행 ?)?상황|숙제|다음 ?수업 ?계획|추가 ?전달사항)|$))`, 'i');
+          const match = text.match(regex);
+          if (match) {
+            // Clean up: remove the keyword line itself, backticks, bold marks
+            let content = match[0].replace(new RegExp(`^(?:\\*\\*|\\*|- )?${kw}.*\\n`, 'i'), '').trim();
+            content = content.replace(/\\*\\*/g, '').trim();
+            if (content.startsWith(':')) content = content.substring(1).trim();
+            return content;
+          }
+        }
+        return '';
+      };
+
+      const parsedLearn = extract(['오늘 배운 내용', '오늘 배운 내용:', '학습 내용', '학습 목표']);
+      const parsedActivities = extract(['세부 활동', '세부활동', '세부 활동:', '진행 내용', '수업 내용']);
+      const parsedReaction = extract(['반응 및 태도', '반응과 태도', '아이의 반응', '학습 태도']);
+      const parsedProgress = extract(['이해도 및 진행상황', '이해도 및 진행 상황', '이해도 및 상황', '이해도', '진행 상황']);
+      const parsedHomework = extract(['숙제', '과제']);
+      const parsedNext = extract(['다음 수업 계획', '다음 계획', '다음 시간 계획', '다음 수업']);
+      const parsedExtra = extract(['추가 전달사항', '전달사항', '코멘트', '기타']);
+
+      let updated = false;
+      if (parsedLearn) { fields.learn.value = parsedLearn; updated = true; }
+      if (parsedActivities) { fields.activities.value = parsedActivities; updated = true; }
+      if (parsedReaction) { fields.reaction.value = parsedReaction; updated = true; }
+      if (parsedProgress) { fields.progress.value = parsedProgress; updated = true; }
+      if (parsedHomework) { fields.homework.value = parsedHomework; updated = true; }
+      if (parsedNext) { fields.next.value = parsedNext; updated = true; }
+      if (parsedExtra) { fields.extra.value = parsedExtra; updated = true; }
+
+      if (updated) {
+        schedulePreview();
+        aiParseBtn.textContent = "분배 완료!";
+        aiParseBtn.style.background = "rgba(16,185,129,0.1)";
+        aiParseBtn.style.color = "#059669";
+        aiParseBtn.style.borderColor = "rgba(16,185,129,0.2)";
+        setTimeout(() => {
+          aiParseBtn.innerHTML = "<span>내용 자동 분배하기</span>";
+          aiParseBtn.style = "display:flex; justify-content:center; gap:8px; align-items:center;";
+        }, 2000);
+      } else {
+        alert("텍스트에서 항목(세부 활동, 숙제 등)을 찾지 못했습니다. 키워드가 포함되어 있는지 확인해주세요.");
+      }
+    }
+
     setTodayIfEmpty();
     syncSlug();
     updateSlugUI();
+    updateDetailPhotoUI();
     schedulePreview();
 
     fields.slug.addEventListener("input", () => {
@@ -699,6 +998,10 @@
     publishButton.addEventListener("click", publish);
     copyButton.addEventListener("click", copyLink);
     openButton.addEventListener("click", openLink);
+    resetButton.addEventListener("click", resetForm);
+    aiParseBtn.addEventListener("click", parseAIText);
+    detailPhotoInput.addEventListener("change", handleDetailPhotoChange);
+    detailPhotoClearButton.addEventListener("click", clearDetailPhoto);
   </script>
 </body>
 </html>

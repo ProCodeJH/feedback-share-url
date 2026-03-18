@@ -43,12 +43,53 @@ function renderActivities(text) {
     .filter(Boolean);
 
   if (!lines.length) {
-    return '<li class="placeholder">세부 활동을 입력하지 않았습니다.</li>';
+    return '<li class="empty">세부 활동을 입력하지 않았습니다.</li>';
   }
 
   return lines
-    .map((line) => `<li><span class="bullet"></span><span>${escapeHtml(line)}</span></li>`)
+    .map((line) => `<li><span class="dot"></span><span>${escapeHtml(line)}</span></li>`)
     .join("");
+}
+
+const supportedImageMimeTypes = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+  "image/gif": "gif"
+};
+
+function parseImageDataUrl(value) {
+  const text = String(value ?? "").trim();
+  if (!text) return null;
+
+  const match = text.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,([A-Za-z0-9+/=]+)$/);
+  if (!match) return null;
+
+  const mimeType = match[1].toLowerCase();
+  const extension = supportedImageMimeTypes[mimeType];
+  if (!extension) return null;
+
+  return {
+    mimeType,
+    extension,
+    base64: match[2]
+  };
+}
+
+function normalizeImageDataUrl(value) {
+  const parsed = parseImageDataUrl(value);
+  return parsed ? `data:${parsed.mimeType};base64,${parsed.base64}` : "";
+}
+
+export function extractImageFromDataUrl(value) {
+  const parsed = parseImageDataUrl(value);
+  if (!parsed) return null;
+
+  return {
+    mimeType: parsed.mimeType,
+    extension: parsed.extension,
+    buffer: Buffer.from(parsed.base64, "base64")
+  };
 }
 
 export function normalizeFeedbackData(raw = {}) {
@@ -72,12 +113,18 @@ export function normalizeFeedbackData(raw = {}) {
 export function renderFeedbackPageHtml(raw = {}, options = {}) {
   const data = normalizeFeedbackData(raw);
   const logoSrc = options.logoSrc || "../logo.png";
+  const detailPhotoSrc = options.detailPhotoSrc || normalizeImageDataUrl(raw.detailPhotoDataUrl);
+  const hasDetailPhoto = Boolean(detailPhotoSrc);
   const displayDate = formatDate(data.date);
   const studentName = escapeHtml(withFallback(data.name, "학생"));
   const slug = escapeHtml(data.slug);
   const todayFocus = renderText(data.learn, "오늘 배운 내용을 입력하지 않았습니다.");
   const coverLead = `코딩쏙 학원입니다.<br><strong>${studentName} 학생</strong>의 오늘의 수업 피드백 안내드립니다.`;
   const coverSub = `${escapeHtml(displayDate)} 수업 내용을 다음 페이지에서 확인하실 수 있습니다.`;
+  const welcomePanelClassName = hasDetailPhoto ? "welcome-panel has-photo" : "welcome-panel";
+  const welcomePanelStyle = hasDetailPhoto
+    ? ` style="--welcome-photo: url('${escapeHtml(detailPhotoSrc)}');"`
+    : "";
 
   return `<!DOCTYPE html>
 <html lang="ko">
@@ -87,451 +134,428 @@ export function renderFeedbackPageHtml(raw = {}, options = {}) {
   <title>${slug}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Noto+Sans+KR:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #f4efe5;
-      --bg-deep: #ece2d0;
-      --panel: rgba(255, 252, 247, 0.84);
-      --panel-strong: rgba(255,255,255,0.9);
-      --ink: #163026;
-      --ink-soft: #5e7569;
-      --forest: #1f4838;
-      --forest-deep: #10251d;
-      --gold: #bc8a4d;
-      --gold-soft: rgba(188, 138, 77, 0.18);
-      --line: rgba(22, 48, 38, 0.1);
-      --shadow: 0 28px 90px rgba(16, 37, 29, 0.18);
-      --radius-xl: 34px;
-      --radius-lg: 26px;
-      --radius-md: 20px;
+      --bg: #FAFAFA;
+      --surface: #FFFFFF;
+      --text: #111111;
+      --text-sub: #666666;
+      --text-muted: #999999;
+      --border: #E5E7EB;
+      --accent: #0066FF;
+      --accent-soft: rgba(0,102,255,0.06);
+      --accent-border: rgba(0,102,255,0.12);
+      --radius-lg: 16px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.06), 0 1px 3px rgba(0,0,0,0.04);
+      --shadow-lg: 0 12px 40px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
     }
 
-    * { box-sizing: border-box; }
-    html, body { margin: 0; min-height: 100%; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100%; }
 
     body {
-      font-family: "Noto Sans KR", sans-serif;
-      color: var(--ink);
-      background:
-        radial-gradient(circle at top left, rgba(188, 138, 77, 0.26), transparent 30%),
-        radial-gradient(circle at top right, rgba(31, 72, 56, 0.18), transparent 32%),
-        linear-gradient(180deg, var(--bg-deep) 0%, var(--bg) 46%, #efe8dc 100%);
-      overflow-x: hidden;
-    }
-
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background:
-        linear-gradient(rgba(255,255,255,0.14) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.14) 1px, transparent 1px);
-      background-size: 26px 26px;
-      opacity: 0.18;
-      mix-blend-mode: soft-light;
+      font-family: 'Inter', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
     }
 
     .shell {
       min-height: 100vh;
-      padding: 24px 18px 40px;
+      padding: 24px 20px 48px;
     }
 
-    .viewer-nav {
+    /* ===== NAV ===== */
+    .nav {
       position: sticky;
-      top: 16px;
+      top: 12px;
       z-index: 10;
       display: flex;
       justify-content: space-between;
       align-items: center;
       gap: 14px;
-      max-width: 1020px;
-      margin: 0 auto 18px;
-      padding: 14px 16px;
-      border-radius: 22px;
-      background: rgba(255,252,247,0.7);
-      border: 1px solid rgba(22, 48, 38, 0.08);
-      backdrop-filter: blur(16px);
-      box-shadow: 0 16px 44px rgba(16, 37, 29, 0.08);
+      max-width: 960px;
+      margin: 0 auto 20px;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,0.85);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: var(--shadow-sm);
     }
 
-    .viewer-meta {
+    .nav-left {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       min-width: 0;
-      color: var(--ink-soft);
-      font-size: 12px;
-      font-weight: 700;
     }
 
     .page-pill {
       display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 92px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(31, 72, 56, 0.08);
-      color: var(--forest);
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      flex-shrink: 0;
-    }
-
-    #page-caption {
-      min-width: 0;
-      line-height: 1.55;
-    }
-
-    .viewer-buttons {
-      display: flex;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-
-    button {
-      appearance: none;
-      border: 1px solid rgba(31, 72, 56, 0.12);
-      border-radius: 999px;
-      padding: 12px 16px;
-      font: inherit;
-      font-weight: 800;
-      cursor: pointer;
-      background: rgba(31, 72, 56, 0.08);
-      color: var(--forest);
-      transition: transform 0.18s ease, opacity 0.18s ease, background 0.18s ease;
-    }
-
-    button:hover { transform: translateY(-1px); }
-    button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-    .sheet {
-      position: relative;
-      max-width: 1020px;
-      margin: 0 auto;
-      padding: clamp(24px, 3.8vw, 40px);
-      border-radius: var(--radius-xl);
-      background:
-        linear-gradient(145deg, rgba(255,255,255,0.9), rgba(248,242,234,0.96));
-      border: 1px solid rgba(22, 48, 38, 0.08);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      isolation: isolate;
-    }
-
-    .sheet::before,
-    .sheet::after {
-      content: "";
-      position: absolute;
-      border-radius: 50%;
-      z-index: -1;
-    }
-
-    .sheet::before {
-      width: 360px;
-      height: 360px;
-      right: -150px;
-      top: -150px;
-      background: radial-gradient(circle, rgba(188, 138, 77, 0.24), transparent 70%);
-    }
-
-    .sheet::after {
-      width: 420px;
-      height: 420px;
-      left: -210px;
-      bottom: -220px;
-      background: radial-gradient(circle, rgba(31, 72, 56, 0.16), transparent 72%);
-    }
-
-    .page { display: none; }
-    .page.is-active { display: block; }
-
-    .cover-page {
-      min-height: 720px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .cover-card {
-      width: 100%;
-      max-width: 820px;
-      padding: clamp(30px, 5vw, 54px);
-      border-radius: 38px;
-      background:
-        radial-gradient(circle at top, rgba(255,255,255,0.1), transparent 30%),
-        linear-gradient(145deg, rgba(16, 37, 29, 0.98), rgba(31, 72, 56, 0.95));
-      color: white;
-      text-align: center;
-      box-shadow: 0 34px 90px rgba(16, 37, 29, 0.26);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .cover-card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background:
-        repeating-linear-gradient(
-          -35deg,
-          rgba(255,255,255,0.05) 0 1px,
-          transparent 1px 18px
-        );
-      opacity: 0.5;
-      pointer-events: none;
-    }
-
-    .cover-card > * { position: relative; }
-
-    .cover-logo-wrap {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 24px;
-    }
-
-    .cover-logo-shell {
-      width: 168px;
-      height: 168px;
-      display: grid;
-      place-items: center;
-      border-radius: 50%;
-      background:
-        linear-gradient(145deg, rgba(255,255,255,0.18), rgba(255,255,255,0.02));
-      border: 1px solid rgba(255,255,255,0.12);
-      box-shadow:
-        0 18px 46px rgba(0,0,0,0.18),
-        inset 0 0 0 12px rgba(255,255,255,0.04);
-      backdrop-filter: blur(8px);
-    }
-
-    .cover-logo {
-      width: 104px;
-      height: auto;
-      filter: drop-shadow(0 16px 22px rgba(0,0,0,0.22));
-    }
-
-    .cover-kicker {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.08);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-    }
-
-    .cover-kicker::before {
-      content: "";
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #f3cb8c, #c9954a);
-      box-shadow: 0 0 0 6px rgba(243, 203, 140, 0.14);
-    }
-
-    .cover-title {
-      margin: 24px 0 14px;
-      font-family: "Cormorant Garamond", serif;
-      font-size: clamp(48px, 7vw, 82px);
-      line-height: 0.9;
-      letter-spacing: -0.04em;
-    }
-
-    .cover-message {
-      margin: 0 auto;
-      max-width: 25ch;
-      font-size: clamp(22px, 3vw, 36px);
-      font-weight: 700;
-      line-height: 1.46;
-    }
-
-    .cover-message strong {
-      color: #f2cb90;
-      font-weight: 800;
-    }
-
-    .cover-sub {
-      margin: 20px auto 0;
-      max-width: 48ch;
-      color: rgba(255,255,255,0.72);
-      font-size: 14px;
-      line-height: 1.85;
-    }
-
-    .detail-head {
-      display: grid;
-      grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
-      gap: 18px;
-      margin-bottom: 18px;
-    }
-
-    .welcome-card {
-      padding: 24px;
-      border-radius: var(--radius-lg);
-      background:
-        linear-gradient(145deg, rgba(16, 37, 29, 0.98), rgba(31, 72, 56, 0.92));
-      color: white;
-      min-height: 260px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .welcome-card .eyebrow {
-      width: fit-content;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.08);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-    }
-
-    .welcome-card h2 {
-      margin: 20px 0 10px;
-      font-family: "Cormorant Garamond", serif;
-      font-size: clamp(38px, 4vw, 60px);
-      line-height: 0.9;
-      letter-spacing: -0.04em;
-    }
-
-    .welcome-card p {
-      margin: 0;
-      color: rgba(255,255,255,0.76);
-      line-height: 1.8;
-    }
-
-    .summary-stack {
-      display: grid;
-      gap: 18px;
-    }
-
-    .summary-card,
-    .focus-card,
-    .meta-card,
-    .section-card {
-      padding: 20px;
-      border-radius: var(--radius-lg);
-      background: var(--panel);
-      border: 1px solid rgba(22, 48, 38, 0.08);
-    }
-
-    .summary-card {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      align-items: start;
-    }
-
-    .meta-kicker {
-      color: var(--forest);
-      font-size: 11px;
-      font-weight: 800;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-    }
-
-    .student-name {
-      margin-top: 10px;
-      color: var(--ink);
-      font-family: "Cormorant Garamond", serif;
-      font-size: clamp(32px, 4vw, 44px);
-      line-height: 0.92;
-      letter-spacing: -0.03em;
-    }
-
-    .student-name span {
-      display: block;
-      margin-top: 10px;
-      color: var(--ink-soft);
-      font-family: "Noto Sans KR", sans-serif;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-    }
-
-    .date-chip {
-      padding: 11px 14px;
-      border-radius: 18px;
-      background: var(--gold-soft);
-      color: #6d4a1f;
+      padding: 5px 10px;
+      border-radius: 6px;
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-border);
+      color: var(--accent);
       font-size: 12px;
       font-weight: 700;
       white-space: nowrap;
     }
 
-    .focus-card {
-      background:
-        linear-gradient(180deg, rgba(31, 72, 56, 0.07), rgba(31, 72, 56, 0.03));
+    #page-caption {
+      font-size: 12px;
+      color: var(--text-muted);
+      min-width: 0;
     }
 
-    .focus-card strong,
-    .meta-card strong,
-    .section-card strong {
-      display: block;
-      margin-bottom: 8px;
-      color: var(--forest);
+    .nav-buttons { display: flex; gap: 6px; flex-shrink: 0; }
+
+    button {
+      appearance: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 14px;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--surface);
+      color: var(--text);
+      box-shadow: var(--shadow-sm);
+      transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    button:hover:not(:disabled) {
+      background: #F9FAFB;
+      border-color: #D1D5DB;
+    }
+
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* ===== SHEET ===== */
+    .sheet {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: clamp(24px, 4vw, 40px);
+      border-radius: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ===== COVER PAGE ===== */
+    .cover {
+      min-height: 640px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cover-inner {
+      width: 100%;
+      max-width: 720px;
+      padding: clamp(32px, 5vw, 56px);
+      border-radius: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-md);
+      text-align: center;
+    }
+
+    .cover-logo-wrap {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 28px;
+    }
+
+    .cover-logo-ring {
+      width: 160px;
+      height: 160px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #F9FAFB, #FFFFFF);
+      border: 1px solid var(--border);
+      box-shadow:
+        var(--shadow-lg),
+        inset 0 1px 0 rgba(255,255,255,0.8);
+    }
+
+    .cover-logo {
+      width: 100px;
+      height: auto;
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.08));
+    }
+
+    .cover-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 6px;
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-border);
       font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .cover-badge::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .cover-title {
+      margin: 28px 0 16px;
+      font-size: clamp(36px, 6vw, 60px);
       font-weight: 800;
-      letter-spacing: 0.14em;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      color: var(--text);
+    }
+
+    .cover-message {
+      margin: 0 auto;
+      max-width: 24ch;
+      font-size: clamp(18px, 2.5vw, 28px);
+      font-weight: 600;
+      line-height: 1.5;
+      color: var(--text);
+    }
+
+    .cover-message strong {
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    .cover-sub {
+      margin: 16px auto 0;
+      max-width: 42ch;
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    /* ===== DETAIL PAGE ===== */
+    .detail-head {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .welcome-panel {
+      padding: 28px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(145deg, #F0F7FF, #FAFAFA);
+      border: 1px solid var(--accent-border);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 240px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .welcome-panel > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    .welcome-panel.has-photo {
+      background:
+        linear-gradient(180deg, rgba(10,18,34,0.14), rgba(10,18,34,0.62)),
+        var(--welcome-photo) center center / cover no-repeat;
+      border-color: rgba(255,255,255,0.18);
+      box-shadow: var(--shadow-md);
+    }
+
+    .welcome-panel.has-photo::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(10,18,34,0.08), rgba(10,18,34,0.36) 46%, rgba(10,18,34,0.8));
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .tag {
+      display: inline-flex;
+      width: fit-content;
+      padding: 5px 10px;
+      border-radius: 6px;
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-border);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .welcome-panel.has-photo .tag {
+      background: rgba(255,255,255,0.16);
+      border-color: rgba(255,255,255,0.2);
+      color: #FFFFFF;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .welcome-panel h2 {
+      margin: 18px 0 8px;
+      font-size: clamp(24px, 3vw, 36px);
+      font-weight: 800;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+
+    .welcome-panel.has-photo h2 {
+      color: #FFFFFF;
+      text-shadow: 0 10px 28px rgba(0,0,0,0.3);
+      max-width: 10ch;
+    }
+
+    .welcome-panel p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .welcome-panel.has-photo p {
+      color: rgba(255,255,255,0.86);
+      text-shadow: 0 8px 24px rgba(0,0,0,0.28);
+      max-width: 34ch;
+    }
+
+    .info-stack { display: grid; gap: 12px; }
+
+    .info-card {
+      padding: 16px;
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+
+    .info-card.summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 12px;
+    }
+
+    .label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .student-name {
+      font-size: clamp(24px, 3vw, 34px);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .student-name span {
+      display: block;
+      margin-top: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
       text-transform: uppercase;
     }
 
-    .focus-body,
-    .meta-value,
-    .body-text {
+    .date-chip {
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-border);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .info-card.focus {
+      background: #FAFBFF;
+      border-color: var(--accent-border);
+    }
+
+    .body-text, .focus-text, .slug-text {
       margin: 0;
-      color: var(--ink-soft);
+      color: var(--text-sub);
       font-size: 14px;
-      line-height: 1.85;
+      line-height: 1.8;
       white-space: pre-wrap;
       word-break: keep-all;
     }
 
-    .meta-value {
-      color: var(--ink);
-      font-weight: 700;
+    .slug-text {
+      color: var(--text);
+      font-weight: 600;
       word-break: break-all;
+      font-family: 'SF Mono', 'Consolas', monospace;
+      font-size: 13px;
     }
 
-    .section-grid {
+    /* ===== SECTION GRID ===== */
+    .grid {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 18px;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
     }
 
-    .section-card {
-      min-height: 196px;
+    .card {
+      padding: 20px;
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      border: 1px solid var(--border);
       display: grid;
-      gap: 14px;
+      gap: 10px;
       align-content: start;
+      min-height: 160px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
-    .section-card.span-2 { grid-column: span 2; }
-
-    .section-index {
-      color: rgba(188, 138, 77, 0.9);
-      font-family: "Cormorant Garamond", serif;
-      font-size: 34px;
-      line-height: 1;
+    .card:hover {
+      border-color: #D1D5DB;
+      box-shadow: var(--shadow-sm);
     }
 
-    .section-title {
-      margin: 0;
-      color: var(--ink);
-      font-size: 21px;
+    .card.span { grid-column: span 2; }
+
+    .card-index {
+      font-size: 28px;
       font-weight: 800;
-      letter-spacing: -0.02em;
+      color: var(--accent);
+      line-height: 1;
+      opacity: 0.5;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
     }
 
     .activity-list {
@@ -539,114 +563,96 @@ export function renderFeedbackPageHtml(raw = {}, options = {}) {
       padding: 0;
       list-style: none;
       display: grid;
-      gap: 12px;
+      gap: 8px;
     }
 
     .activity-list li {
       display: grid;
-      grid-template-columns: 14px 1fr;
+      grid-template-columns: 12px 1fr;
       gap: 10px;
-      color: var(--ink-soft);
+      color: var(--text-sub);
       font-size: 14px;
-      line-height: 1.75;
+      line-height: 1.7;
     }
 
-    .bullet {
-      width: 10px;
-      height: 10px;
+    .dot {
+      width: 8px;
+      height: 8px;
       margin-top: 8px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--gold), #e2c08e);
-      box-shadow: 0 0 0 6px rgba(188, 138, 77, 0.12);
+      background: var(--accent);
+      opacity: 0.4;
     }
 
-    .placeholder {
-      color: rgba(94, 117, 105, 0.64);
+    .empty {
+      color: var(--text-muted);
       font-style: italic;
+      font-size: 14px;
     }
 
+    /* ===== FOOTER ===== */
     .foot {
-      margin-top: 22px;
-      padding-top: 18px;
-      border-top: 1px solid var(--line);
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
       display: flex;
       justify-content: space-between;
-      gap: 16px;
       align-items: center;
-      color: var(--ink-soft);
+      color: var(--text-muted);
       font-size: 12px;
-      line-height: 1.7;
     }
 
     .brand {
       display: flex;
       align-items: center;
-      gap: 10px;
-      color: var(--forest);
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 0.1em;
+      gap: 8px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.06em;
       text-transform: uppercase;
     }
 
     .brand::before {
       content: "";
-      width: 12px;
-      height: 12px;
+      width: 8px;
+      height: 8px;
       border-radius: 50%;
-      background: linear-gradient(135deg, var(--forest), var(--gold));
+      background: var(--accent);
     }
 
-    @media (max-width: 920px) {
-      .viewer-nav,
-      .summary-card,
-      .foot {
-        flex-direction: column;
-        align-items: start;
-      }
-
-      .viewer-buttons {
-        width: 100%;
-      }
-
-      .viewer-buttons button {
-        flex: 1;
-      }
-
-      .detail-head,
-      .section-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .section-card.span-2 {
-        grid-column: span 1;
-      }
+    @media (max-width: 800px) {
+      .nav, .foot { flex-direction: column; align-items: start; }
+      .nav-buttons { width: 100%; }
+      .nav-buttons button { flex: 1; }
+      .detail-head, .grid { grid-template-columns: 1fr; }
+      .card.span { grid-column: span 1; }
+      .info-card.summary { flex-direction: column; }
     }
   </style>
 </head>
 <body>
   <div class="shell">
-    <div class="viewer-nav">
-      <div class="viewer-meta">
+    <div class="nav">
+      <div class="nav-left">
         <div class="page-pill" id="page-pill">Page 1 / 2</div>
-        <div id="page-caption">첫 페이지는 안내 표지이고, 다음 버튼을 누르면 실제 피드백 내용이 열립니다.</div>
+        <div id="page-caption">안내 표지입니다. 다음 버튼을 누르면 피드백 내용이 열립니다.</div>
       </div>
-      <div class="viewer-buttons">
-        <button id="btn-prev-page" type="button">이전 페이지</button>
-        <button id="btn-next-page" type="button">피드백 보기</button>
+      <div class="nav-buttons">
+        <button id="btn-prev" type="button">이전</button>
+        <button id="btn-next" type="button">피드백 보기</button>
       </div>
     </div>
 
     <article class="sheet">
-      <section class="page is-active" data-page="1">
-        <section class="cover-page">
-          <div class="cover-card">
+      <section class="page active" data-page="1">
+        <section class="cover">
+          <div class="cover-inner">
             <div class="cover-logo-wrap">
-              <div class="cover-logo-shell">
+              <div class="cover-logo-ring">
                 <img class="cover-logo" src="${escapeHtml(logoSrc)}" alt="코딩쏙 학원 로고">
               </div>
             </div>
-            <div class="cover-kicker">Lesson Letter</div>
+            <div class="cover-badge">Lesson Letter</div>
             <h1 class="cover-title">학부모님<br>안녕하세요.</h1>
             <p class="cover-message">${coverLead}</p>
             <p class="cover-sub">${coverSub}</p>
@@ -656,76 +662,76 @@ export function renderFeedbackPageHtml(raw = {}, options = {}) {
 
       <section class="page" data-page="2">
         <div class="detail-head">
-          <section class="welcome-card">
-            <div class="eyebrow">Detail Page</div>
+          <section class="${welcomePanelClassName}"${welcomePanelStyle}>
+            <div class="tag">Detail Page</div>
             <div>
               <h2>오늘의 수업을<br>한 장에 담았습니다.</h2>
-              <p>첫 페이지에서 안내를 확인한 뒤, 이 페이지에서 실제 수업 피드백과 이후 학습 계획을 이어서 보실 수 있습니다.</p>
+              <p>이 페이지에서 실제 수업 피드백과 이후 학습 계획을 확인하실 수 있습니다.</p>
             </div>
           </section>
 
-          <div class="summary-stack">
-            <section class="summary-card">
+          <div class="info-stack">
+            <section class="info-card summary">
               <div>
-                <div class="meta-kicker">Student Record</div>
-                <div class="student-name">${studentName}<span>Class Progress Snapshot</span></div>
+                <div class="label">Student</div>
+                <div class="student-name">${studentName}<span>Progress Snapshot</span></div>
               </div>
               <div class="date-chip">${escapeHtml(displayDate)}</div>
             </section>
 
-            <section class="meta-card">
-              <strong>URL Name</strong>
-              <div class="meta-value">${slug}</div>
+            <section class="info-card">
+              <div class="label">URL Name</div>
+              <div class="slug-text">${slug}</div>
             </section>
 
-            <section class="focus-card">
-              <strong>Today Focus</strong>
-              <p class="focus-body">${todayFocus}</p>
+            <section class="info-card focus">
+              <div class="label">Today Focus</div>
+              <p class="focus-text">${todayFocus}</p>
             </section>
           </div>
         </div>
 
-        <section class="section-grid">
-          <section class="section-card">
-            <div class="section-index">01</div>
-            <h3 class="section-title">세부 활동</h3>
+        <section class="grid">
+          <section class="card">
+            <div class="card-index">01</div>
+            <h3 class="card-title">세부 활동</h3>
             <ul class="activity-list">${renderActivities(data.activities)}</ul>
           </section>
 
-          <section class="section-card">
-            <div class="section-index">02</div>
-            <h3 class="section-title">아이의 반응 및 태도</h3>
+          <section class="card">
+            <div class="card-index">02</div>
+            <h3 class="card-title">아이의 반응 및 태도</h3>
             <p class="body-text">${renderText(data.reaction, "아이의 반응 및 태도를 입력하지 않았습니다.")}</p>
           </section>
 
-          <section class="section-card">
-            <div class="section-index">03</div>
-            <h3 class="section-title">이해도 및 진행 상황</h3>
+          <section class="card">
+            <div class="card-index">03</div>
+            <h3 class="card-title">이해도 및 진행 상황</h3>
             <p class="body-text">${renderText(data.progress, "이해도 및 진행 상황을 입력하지 않았습니다.")}</p>
           </section>
 
-          <section class="section-card">
-            <div class="section-index">04</div>
-            <h3 class="section-title">숙제</h3>
+          <section class="card">
+            <div class="card-index">04</div>
+            <h3 class="card-title">숙제</h3>
             <p class="body-text">${renderText(data.homework, "숙제를 입력하지 않았습니다.")}</p>
           </section>
 
-          <section class="section-card span-2">
-            <div class="section-index">05</div>
-            <h3 class="section-title">다음 수업 계획</h3>
+          <section class="card span">
+            <div class="card-index">05</div>
+            <h3 class="card-title">다음 수업 계획</h3>
             <p class="body-text">${renderText(data.next, "다음 수업 계획을 입력하지 않았습니다.")}</p>
           </section>
 
-          <section class="section-card span-2">
-            <div class="section-index">06</div>
-            <h3 class="section-title">추가 전달사항</h3>
+          <section class="card span">
+            <div class="card-index">06</div>
+            <h3 class="card-title">추가 전달사항</h3>
             <p class="body-text">${renderText(data.extra, "추가 전달사항을 입력하지 않았습니다.")}</p>
           </section>
         </section>
 
         <footer class="foot">
-          <div class="brand">Class Feedback Letter</div>
-          <div>코딩쏙 학원 수업 피드백 안내 페이지입니다.</div>
+          <div class="brand">Feedback Letter</div>
+          <div>코딩쏙 학원 수업 피드백</div>
         </footer>
       </section>
     </article>
@@ -733,32 +739,29 @@ export function renderFeedbackPageHtml(raw = {}, options = {}) {
 
   <script>
     const pages = Array.from(document.querySelectorAll(".page"));
-    const pagePill = document.getElementById("page-pill");
-    const pageCaption = document.getElementById("page-caption");
-    const prevButton = document.getElementById("btn-prev-page");
-    const nextButton = document.getElementById("btn-next-page");
-    let currentPage = 1;
+    const pill = document.getElementById("page-pill");
+    const caption = document.getElementById("page-caption");
+    const prev = document.getElementById("btn-prev");
+    const next = document.getElementById("btn-next");
+    let cur = 1;
 
-    function updatePage(page) {
-      currentPage = Math.max(1, Math.min(2, page));
-      pages.forEach((section) => {
-        section.classList.toggle("is-active", Number(section.dataset.page) === currentPage);
-      });
-
-      pagePill.textContent = "Page " + currentPage + " / 2";
-      pageCaption.textContent = currentPage === 1
-        ? "첫 페이지는 안내 표지이고, 다음 버튼을 누르면 실제 피드백 내용이 열립니다."
-        : "둘째 페이지에서 실제 피드백 내용을 이어서 봅니다.";
-      prevButton.disabled = currentPage === 1;
-      nextButton.disabled = currentPage === 2;
-      prevButton.textContent = currentPage === 1 ? "이전 페이지" : "첫 페이지로";
-      nextButton.textContent = currentPage === 1 ? "피드백 보기" : "마지막 페이지";
+    function go(p) {
+      cur = Math.max(1, Math.min(2, p));
+      pages.forEach(s => s.classList.toggle("active", +s.dataset.page === cur));
+      pill.textContent = "Page " + cur + " / 2";
+      caption.textContent = cur === 1
+        ? "안내 표지입니다. 다음 버튼을 누르면 피드백 내용이 열립니다."
+        : "수업 피드백 상세 내용입니다.";
+      prev.disabled = cur === 1;
+      next.disabled = cur === 2;
+      prev.textContent = cur === 1 ? "이전" : "표지로";
+      next.textContent = cur === 1 ? "피드백 보기" : "마지막";
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
-    prevButton.addEventListener("click", () => updatePage(currentPage - 1));
-    nextButton.addEventListener("click", () => updatePage(currentPage + 1));
-    updatePage(1);
+    prev.addEventListener("click", () => go(cur - 1));
+    next.addEventListener("click", () => go(cur + 1));
+    go(1);
   </script>
 </body>
 </html>`;

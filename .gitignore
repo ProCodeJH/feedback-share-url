@@ -1,0 +1,13 @@
+node_modules/
+dist/
+
+*.log
+electron_build.txt
+builder-debug.yml
+builder-effective-config.yaml
+
+build.ps1
+run_invisible.vbs
+start.mjs
+
+/코딩쏙 피드백 스튜디오.exe

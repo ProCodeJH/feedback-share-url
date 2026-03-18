@@ -3,6 +3,44 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "publisher": "node tools/publisher-server.mjs"
+    "publisher": "node tools/publisher-server.mjs",
+    "start": "electron .",
+    "build": "electron-builder --win portable"
+  },
+  "version": "1.0.0",
+  "description": "피드백 발행 스튜디오 데스크탑 앱",
+  "main": "main.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ProCodeJH/feedback-share-url.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ProCodeJH/feedback-share-url/issues"
+  },
+  "homepage": "https://github.com/ProCodeJH/feedback-share-url#readme",
+  "devDependencies": {
+    "electron": "^30.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.codingssok.feedbackstudio",
+    "productName": "코딩쏙 피드백 스튜디오",
+    "directories": {
+      "output": "dist"
+    },
+    "npmRebuild": false,
+    "buildDependenciesFromSource": true,
+    "files": [
+      "main.js",
+      "tools/**/*",
+      "publisher/**/*",
+      "logo.png"
+    ],
+    "win": {
+      "target": "portable"
+    }
   }
 }
